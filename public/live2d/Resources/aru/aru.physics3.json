@@ -2,7 +2,7 @@
 	"Version": 3,
 	"Meta": {
 		"PhysicsSettingCount": 5,
-		"TotalInputCount": 9,
+		"TotalInputCount": 11,
 		"TotalOutputCount": 5,
 		"VertexCount": 12,
 		"Fps": 60,
@@ -50,6 +50,15 @@
 					},
 					"Weight": 100,
 					"Type": "Angle",
+					"Reflect": false
+				},
+				{
+					"Source": {
+						"Target": "Parameter",
+						"Id": "ParamBreath"
+					},
+					"Weight": 1,
+					"Type": "X",
 					"Reflect": false
 				}
 			],
@@ -112,6 +121,15 @@
 					"Weight": 100,
 					"Type": "Angle",
 					"Reflect": false
+				},
+				{
+					"Source": {
+						"Target": "Parameter",
+						"Id": "ParamBreath"
+					},
+					"Weight": 1,
+					"Type": "X",
+					"Reflect": true
 				}
 			],
 			"Output": [

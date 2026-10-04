@@ -2,8 +2,8 @@
 	"Version": 3,
 	"Meta": {
 		"PhysicsSettingCount": 5,
-		"TotalInputCount": 11,
-		"TotalOutputCount": 6,
+		"TotalInputCount": 9,
+		"TotalOutputCount": 5,
 		"VertexCount": 12,
 		"Fps": 60,
 		"EffectiveForces": {
@@ -27,7 +27,7 @@
 			},
 			{
 				"Id": "PhysicsSetting3",
-				"Name": "尾巴摆动"
+				"Name": "尾巴尖呼吸"
 			},
 			{
 				"Id": "PhysicsSetting4",
@@ -83,8 +83,8 @@
 						"Y": 3
 					},
 					"Mobility": 1,
-					"Delay": 1.5,
-					"Acceleration": 2,
+					"Delay": 1,
+					"Acceleration": 1,
 					"Radius": 3
 				}
 			],
@@ -144,8 +144,8 @@
 						"Y": 3
 					},
 					"Mobility": 1,
-					"Delay": 1.5,
-					"Acceleration": 2,
+					"Delay": 1,
+					"Acceleration": 1,
 					"Radius": 3
 				}
 			],
@@ -168,28 +168,10 @@
 				{
 					"Source": {
 						"Target": "Parameter",
-						"Id": "ParamAngleZ"
+						"Id": "ParamBreath"
 					},
 					"Weight": 100,
 					"Type": "Angle",
-					"Reflect": false
-				},
-				{
-					"Source": {
-						"Target": "Parameter",
-						"Id": "ParamAngleX"
-					},
-					"Weight": 30,
-					"Type": "X",
-					"Reflect": false
-				},
-				{
-					"Source": {
-						"Target": "Parameter",
-						"Id": "ParamAngleY"
-					},
-					"Weight": 30,
-					"Type": "X",
 					"Reflect": false
 				}
 			],
@@ -197,24 +179,13 @@
 				{
 					"Destination": {
 						"Target": "Parameter",
-						"Id": "Param10"
-					},
-					"VertexIndex": 1,
-					"Scale": 170,
-					"Weight": 100,
-					"Type": "Angle",
-					"Reflect": true
-				},
-				{
-					"Destination": {
-						"Target": "Parameter",
 						"Id": "Param6"
 					},
-					"VertexIndex": 2,
+					"VertexIndex": 1,
 					"Scale": 100,
 					"Weight": 100,
 					"Type": "Angle",
-					"Reflect": true
+					"Reflect": false
 				}
 			],
 			"Vertices": [
@@ -234,8 +205,8 @@
 						"Y": 7
 					},
 					"Mobility": 1,
-					"Delay": 4.9,
-					"Acceleration": 5,
+					"Delay": 1,
+					"Acceleration": 1,
 					"Radius": 7
 				},
 				{
@@ -253,7 +224,7 @@
 						"X": 0,
 						"Y": 15
 					},
-					"Mobility": 0.95,
+					"Mobility": 1,
 					"Delay": 1,
 					"Acceleration": 1,
 					"Radius": 3
@@ -267,7 +238,7 @@
 				},
 				"Angle": {
 					"Minimum": -10,
-					"Default": -9.6,
+					"Default": 0,
 					"Maximum": 10
 				}
 			}
@@ -386,10 +357,10 @@
 				{
 					"Destination": {
 						"Target": "Parameter",
-						"Id": "Param9"
+						"Id": "ParamYubiZ"
 					},
 					"VertexIndex": 1,
-					"Scale": 200,
+					"Scale": 5,
 					"Weight": 100,
 					"Type": "Angle",
 					"Reflect": false

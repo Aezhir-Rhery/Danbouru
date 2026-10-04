@@ -57,9 +57,9 @@
 			"Name": "R耳-旋转"
 		},
 		{
-			"Id": "Param9",
+			"Id": "ParamYubiZ",
 			"GroupId": "ParamGroupBody",
-			"Name": "蝴蝶结"
+			"Name": "蝴蝶结-旋转"
 		},
 		{
 			"Id": "Param8",
@@ -75,6 +75,11 @@
 			"Id": "Param6",
 			"GroupId": "",
 			"Name": "尾-尖尖"
+		},
+		{
+			"Id": "ParamBreath",
+			"GroupId": "",
+			"Name": "呼吸"
 		}
 	],
 	"ParameterGroups": [
@@ -99,18 +104,6 @@
 		[
 			"ParamFaceX",
 			"ParamFaceY"
-		],
-		[
-			"ParamREarY",
-			"ParamLEarY"
-		],
-		[
-			"ParamLEarZ",
-			"ParamREarZ"
-		],
-		[
-			"Param9",
-			"Param8"
 		]
 	]
 }

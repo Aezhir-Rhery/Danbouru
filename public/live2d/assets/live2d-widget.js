@@ -5810,7 +5810,11 @@ var da = class extends la {
         },
         a = () => {
           this._breath = Re.create();
-          let e = [];
+          // 呼吸待机：中心值、振幅、周期（秒）、权重。
+          // 在物理运算之前更新，让尾尖物理读取本帧的呼吸参数。
+          let e = [
+            new ze(j.getIdManager().getId('ParamBreath'), 0.5, 0.5, 3.5, 1)
+          ];
           this._breath.setParameters(e);
           let t = new Yi(this._breath);
           this._updateScheduler.addUpdatableList(t), this._state = $.LoadUserData, o()
@@ -5844,7 +5848,7 @@ var da = class extends la {
         },
         l = () => {
           this._look = Ve.create();
-          let e = [new He(j.getIdManager().getId(`ParamAngleX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamAngleY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamAngleZ`), -12, 0, 0), new He(j.getIdManager().getId(`ParamFaceX`), 30, 0, 0), new He(j.getIdManager().getId(`ParamFaceY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamREarX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamLEarX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamREarY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamLEarY`), 0, 1, 0)];
+          let e = [new He(j.getIdManager().getId(`ParamAngleX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamAngleY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamAngleZ`), -12, 0, 0), new He(j.getIdManager().getId(`ParamFaceX`), 30, 0, 0), new He(j.getIdManager().getId(`ParamFaceY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamREarX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamLEarX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamREarY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamLEarY`), 0, 1, 0),new He(j.getIdManager().getId(`Param10`), -30, 0, 0)];
           this._look.setParameters(e);
           let t = new Zi(this._look, this._dragManager);
           this._updateScheduler.addUpdatableList(t), u()
@@ -6467,7 +6471,6 @@ var ba = class {
       this._canvases.length = 1, this._subdelegates.length = 1;
       for (let e = 0; e < 1; e++) {
         let t = document.createElement(`canvas`);
-        // 在这改猫猫大小t.style.width和猫猫位置t.style.left
         this._canvases[e] = t, t.style.width = `180px`, t.style.height = `180px`, t.style.position = `fixed`, t.style.left = `25px`, t.style.bottom = `50px`, t.style.zIndex = `50`, t.style.pointerEvents = `none`, document.body.appendChild(t)
       }
       for (let e = 0; e < this._canvases.length; e++) {

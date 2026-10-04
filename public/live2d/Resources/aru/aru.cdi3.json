@@ -1,0 +1,116 @@
+{
+	"Version": 3,
+	"Parameters": [
+		{
+			"Id": "ParamAngleZ",
+			"GroupId": "ParamGroupHead",
+			"Name": "头-旋转"
+		},
+		{
+			"Id": "ParamAngleX",
+			"GroupId": "ParamGroupHead",
+			"Name": "头-左右"
+		},
+		{
+			"Id": "ParamAngleY",
+			"GroupId": "ParamGroupHead",
+			"Name": "头-上下"
+		},
+		{
+			"Id": "ParamFaceX",
+			"GroupId": "ParamGroupHead",
+			"Name": "五官-左右"
+		},
+		{
+			"Id": "ParamFaceY",
+			"GroupId": "ParamGroupHead",
+			"Name": "五官-上下"
+		},
+		{
+			"Id": "ParamREarX",
+			"GroupId": "ParamGroupHead",
+			"Name": "R耳-左右"
+		},
+		{
+			"Id": "ParamLEarX",
+			"GroupId": "ParamGroupHead",
+			"Name": "L耳-左右"
+		},
+		{
+			"Id": "ParamREarY",
+			"GroupId": "ParamGroupHead",
+			"Name": "R耳-上下"
+		},
+		{
+			"Id": "ParamLEarY",
+			"GroupId": "ParamGroupHead",
+			"Name": "L耳-上下"
+		},
+		{
+			"Id": "ParamLEarZ",
+			"GroupId": "ParamGroupHead",
+			"Name": "L耳-旋转"
+		},
+		{
+			"Id": "ParamREarZ",
+			"GroupId": "ParamGroupHead",
+			"Name": "R耳-旋转"
+		},
+		{
+			"Id": "Param9",
+			"GroupId": "ParamGroupBody",
+			"Name": "蝴蝶结"
+		},
+		{
+			"Id": "Param8",
+			"GroupId": "ParamGroupBody",
+			"Name": "身-旋转"
+		},
+		{
+			"Id": "Param10",
+			"GroupId": "",
+			"Name": "尾-旋转"
+		},
+		{
+			"Id": "Param6",
+			"GroupId": "",
+			"Name": "尾-尖尖"
+		}
+	],
+	"ParameterGroups": [
+		{
+			"Id": "ParamGroupHead",
+			"GroupId": "",
+			"Name": "头"
+		},
+		{
+			"Id": "ParamGroupBody",
+			"GroupId": "",
+			"Name": "身体"
+		}
+	],
+	"Parts": [
+		{
+			"Id": "Part",
+			"Name": "头"
+		}
+	],
+	"CombinedParameters": [
+		[
+			"ParamFaceX",
+			"ParamFaceY"
+		],
+		[
+			"ParamREarY",
+			"ParamLEarY"
+		],
+		[
+			"ParamLEarZ",
+			"ParamREarZ"
+		],
+		[
+			"Param9",
+			"Param8"
+		]
+	]
+}

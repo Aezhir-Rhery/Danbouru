@@ -1,7 +1,7 @@
 /* 完全叫GPT移植的L2D组件，Cubism 5 SDK for Web R5 */
 /* 独立于Danbouru主题的组件，放在themes/danbouru/components/Live2DWidget.js中 */
 /* 不依赖notion后台的宠物配置，直接在组件中控制是否加载 */
-import { isMobile } from '@/lib/utils'
+// import { isMobile } from '@/lib/utils'
 import { useEffect } from 'react'
 
 export default function Live2DWidget() {
@@ -18,6 +18,11 @@ export default function Live2DWidget() {
       return
     }
 */
+    // 小于 768px 的窗口不显示；平板和电脑显示
+    if (window.innerWidth < 768) {
+      return
+    }
+    /*
     if (isMobile()) {
       console.log('[Danbouru Live2D] mobile detected, skip loading')
       return
@@ -27,6 +32,7 @@ export default function Live2DWidget() {
       console.log('[Danbouru Live2D] already loaded')
       return
     }
+    */
 
     const loadWidget = () => {
       console.log('[Danbouru Live2D] Cubism Core ready')

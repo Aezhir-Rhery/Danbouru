@@ -197,7 +197,7 @@
 				{
 					"Destination": {
 						"Target": "Parameter",
-						"Id": "Param6"
+						"Id": "ParamTailTopZ"
 					},
 					"VertexIndex": 1,
 					"Scale": 100,
@@ -296,7 +296,7 @@
 				{
 					"Destination": {
 						"Target": "Parameter",
-						"Id": "Param8"
+						"Id": "ParamBodyZ"
 					},
 					"VertexIndex": 1,
 					"Scale": 100,

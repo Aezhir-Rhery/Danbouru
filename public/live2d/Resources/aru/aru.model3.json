@@ -6,7 +6,13 @@
 			"aru.512/texture_00.png"
 		],
 		"Physics": "aru.physics3.json",
-		"DisplayInfo": "aru.cdi3.json"
+		"DisplayInfo": "aru.cdi3.json",
+		"Motions": {
+			"ShakeHead": [{"File": "aru_shake_head.motion3.json", "FadeInTime": 0.1, "FadeOutTime": 0.1}],
+			"SleepIn": [{"File": "aru_sleep_in.motion3.json"}],
+			"SleepLoop": [{"File": "aru_sleep_loop.motion3.json"}],
+			"SleepOut": [{"File": "aru_sleep_out.motion3.json"}]
+		}
 	},
 	"Groups": [
 		{

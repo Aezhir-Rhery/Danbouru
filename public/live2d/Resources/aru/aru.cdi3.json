@@ -27,6 +27,36 @@
 			"Name": "五官-上下"
 		},
 		{
+			"Id": "S_ParamMiEyeL",
+			"GroupId": "ParamGroupHead",
+			"Name": "L眯眯眼开关"
+		},
+		{
+			"Id": "S_ParamMiEyeR",
+			"GroupId": "ParamGroupHead",
+			"Name": "R眯眯眼开关"
+		},
+		{
+			"Id": "ParamEyeCloseL",
+			"GroupId": "ParamGroupHead",
+			"Name": "L普通-闭眼"
+		},
+		{
+			"Id": "ParamEyeCloseR",
+			"GroupId": "ParamGroupHead",
+			"Name": "R普通-闭眼"
+		},
+		{
+			"Id": "ParamZuichunY",
+			"GroupId": "ParamGroupHead",
+			"Name": "嘴唇"
+		},
+		{
+			"Id": "ParamZuibaY",
+			"GroupId": "ParamGroupHead",
+			"Name": "嘴巴"
+		},
+		{
 			"Id": "ParamREarX",
 			"GroupId": "ParamGroupHead",
 			"Name": "R耳-左右"
@@ -62,17 +92,17 @@
 			"Name": "蝴蝶结-旋转"
 		},
 		{
-			"Id": "Param8",
+			"Id": "ParamBodyZ",
 			"GroupId": "ParamGroupBody",
 			"Name": "身-旋转"
 		},
 		{
-			"Id": "Param10",
+			"Id": "ParamTailZ",
 			"GroupId": "",
 			"Name": "尾-旋转"
 		},
 		{
-			"Id": "Param6",
+			"Id": "ParamTailTopZ",
 			"GroupId": "",
 			"Name": "尾-尖尖"
 		},
@@ -80,6 +110,16 @@
 			"Id": "ParamBreath",
 			"GroupId": "",
 			"Name": "呼吸"
+		},
+		{
+			"Id": "S_ParamPao",
+			"GroupId": "ParamGroup",
+			"Name": "泡泡开关"
+		},
+		{
+			"Id": "ParamPao",
+			"GroupId": "ParamGroup",
+			"Name": "泡泡"
 		}
 	],
 	"ParameterGroups": [
@@ -89,15 +129,81 @@
 			"Name": "头"
 		},
 		{
+			"Id": "ParamGroup2",
+			"GroupId": "",
+			"Name": "眯眯眼"
+		},
+		{
 			"Id": "ParamGroupBody",
 			"GroupId": "",
 			"Name": "身体"
+		},
+		{
+			"Id": "ParamGroup",
+			"GroupId": "",
+			"Name": "泡泡"
 		}
 	],
 	"Parts": [
 		{
+			"Id": "Part5",
+			"Name": "泡泡"
+		},
+		{
+			"Id": "Part4",
+			"Name": "爪爪"
+		},
+		{
 			"Id": "Part",
 			"Name": "头"
+		},
+		{
+			"Id": "Part10",
+			"Name": "身体"
+		},
+		{
+			"Id": "Part11",
+			"Name": "尾巴"
+		},
+		{
+			"Id": "Part2",
+			"Name": "L眼"
+		},
+		{
+			"Id": "Part3",
+			"Name": "R眼"
+		},
+		{
+			"Id": "Part6",
+			"Name": "嘴巴"
+		},
+		{
+			"Id": "Part7",
+			"Name": "红晕"
+		},
+		{
+			"Id": "Part8",
+			"Name": "R耳"
+		},
+		{
+			"Id": "Part9",
+			"Name": "L耳"
+		},
+		{
+			"Id": "Part13",
+			"Name": "L眯眯眼"
+		},
+		{
+			"Id": "Part12",
+			"Name": "L普通眼"
+		},
+		{
+			"Id": "Part15",
+			"Name": "R眯眯眼"
+		},
+		{
+			"Id": "Part14",
+			"Name": "R普通眼"
 		}
 	],
 	"CombinedParameters": [

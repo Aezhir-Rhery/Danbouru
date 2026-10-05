@@ -5848,7 +5848,18 @@ var da = class extends la {
         },
         l = () => {
           this._look = Ve.create();
-          let e = [new He(j.getIdManager().getId(`ParamAngleX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamAngleY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamAngleZ`), -12, 0, 0), new He(j.getIdManager().getId(`ParamFaceX`), 30, 0, 0), new He(j.getIdManager().getId(`ParamFaceY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamREarX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamLEarX`), 1, 0, 0), new He(j.getIdManager().getId(`ParamREarY`), 0, 1, 0), new He(j.getIdManager().getId(`ParamLEarY`), 0, 1, 0),new He(j.getIdManager().getId(`Param10`), -30, 0, 0)];
+          let e = [
+            new He(j.getIdManager().getId(`ParamAngleX`), 1, 0, 0),
+            new He(j.getIdManager().getId(`ParamAngleY`), 0, 1, 0),
+            new He(j.getIdManager().getId(`ParamAngleZ`), -12, 0, 0),
+            new He(j.getIdManager().getId(`ParamFaceX`), 30, 0, 0),
+            new He(j.getIdManager().getId(`ParamFaceY`), 0, 1, 0),
+            new He(j.getIdManager().getId(`ParamREarX`), 1, 0, 0),
+            new He(j.getIdManager().getId(`ParamLEarX`), 1, 0, 0),
+            new He(j.getIdManager().getId(`ParamREarY`), 0, 1, 0),
+            new He(j.getIdManager().getId(`ParamLEarY`), 0, 1, 0),
+            new He(j.getIdManager().getId(`ParamTailZ`), -30, 0, 0)
+          ];
           this._look.setParameters(e);
           let t = new Zi(this._look, this._dragManager);
           this._updateScheduler.addUpdatableList(t), u()
@@ -6486,10 +6497,216 @@ var ba = class {
   Ta = () => {
     wa.getInstance().initialize() && wa.getInstance().run()
   };
+// ===== 猫猫动作与交互：日后可直接修改这里的配置 =====
+const CAT_SETTINGS = {
+  idleDelayMs: 5000, // 测试 5 秒；正式使用改为 15000。
+  shakeCount: 2,
+  enterSeconds: 0.4, // 从当前姿势过渡到动作第一帧，再开始完整播放。
+  wakeSeconds: 0.3,
+  loopBlendSeconds: 0.12,
+  returnSeconds: 0.35
+};
+
+ma.prototype.prepareCatState = function() {
+  if (this._catState) return this._catState;
+  const core = this._model.getModel();
+  this._catState = {
+    defaults: Array.from(core.parameters.defaultValues),
+    parts: Array.from(core.parts.opacities),
+    lastActivity: performance.now(), group: null, stage: 'normal',
+    remaining: 0, elapsed: 0, source: null, target: null,
+    queuedShake: false, completed: {}, duration: 0
+  };
+  for (const motion of this._motions.values()) motion.setLoop(false);
+  return this._catState;
+};
+
+ma.prototype.captureCatPose = function() {
+  const core = this._model.getModel();
+  return {values: Array.from(core.parameters.values),
+    parts: Array.from(core.parts.opacities), opacity: this._model.getModelOapcity()};
+};
+
+ma.prototype.restoreCatDefaults = function() {
+  const state = this.prepareCatState();
+  state.defaults.forEach((value, index) => this._model.setParameterValueByIndex(index, value));
+  state.parts.forEach((value, index) => this._model.setPartOpacityByIndex(index, value));
+  this._model.setModelOapcity(1);
+};
+
+ma.prototype.blendCatPose = function(source, target, fraction) {
+  const t = Math.max(0, Math.min(1, fraction));
+  const weight = t*t*(3-2*t);
+  source.values.forEach((value, index) => this._model.setParameterValueByIndex(index,
+    value + (target.values[index]-value)*weight));
+  source.parts.forEach((value, index) => this._model.setPartOpacityByIndex(index,
+    value + (target.parts[index]-value)*weight));
+  this._model.setModelOapcity(source.opacity+(target.opacity-source.opacity)*weight);
+};
+
+// 使用随包 Cubism SDK 的原生曲线求值器，按准确时间读取原始动作。
+// 不再用结束前淡出来混合默认姿势；最后一帧完整显示后才开始下一阶段。
+ma.prototype.sampleCatMotion = function(group, time) {
+  const data = this._motions.get(group+'_0')._motionData;
+  this.restoreCatDefaults();
+  for (let index=0; index<data.curveCount; index++) {
+    const curve = data.curves[index];
+    const value = mn(data, index, time, false, data.duration);
+    if (curve.type === B.CubismMotionCurveTarget_Parameter) {
+      this._model.setParameterValueById(curve.id, value);
+    } else if (curve.type === B.CubismMotionCurveTarget_PartOpacity) {
+      this._model.setPartOpacityById(curve.id, value);
+    } else if (String(curve.id.getString()) === 'Opacity') {
+      this._model.setModelOapcity(value);
+    }
+  }
+};
+
+ma.prototype.startCatStage = function(group, count, blendSeconds) {
+  if (!this._motions.has(group+'_0')) return false;
+  const state = this.prepareCatState();
+  const source = this.captureCatPose();
+  const data = this._motions.get(group+'_0')._motionData;
+  // 导出的 Meta.Duration 有时少保留一位小数，使用曲线实际末点避免截尾。
+  let duration = data.duration;
+  for (let index=0; index<data.curveCount; index++) {
+    const curve=data.curves[index];
+    if (!curve.segmentCount) continue;
+    const last=data.segments[curve.baseSegmentIndex+curve.segmentCount-1];
+    const end=last.basePointIndex+(last.segmentType===V.CubismMotionSegmentType_Bezier?3:1);
+    duration=Math.max(duration,data.points[end].time);
+  }
+  this.sampleCatMotion(group,0);
+  const target=this.captureCatPose();
+  Object.assign(state,{group,remaining:count,stage:'enter',elapsed:0,
+    source,target,blendSeconds,duration});
+  this.blendCatPose(source,target,0);
+  return true;
+};
+
+ma.prototype.finishCatAction = function() {
+  const state=this.prepareCatState();
+  state.source=this.captureCatPose();
+  state.group=null;state.stage='return';state.elapsed=0;
+  // 让物理先稳定在普通状态，再过渡回实时鼠标跟随。
+  this.restoreCatDefaults();
+  if(this._physics)this._physics.stabilization(this._model);
+  this.blendCatPose(state.source,state.source,1);
+};
+
+ma.prototype.noteCatActivity = function() {
+  if(this._state!==$.CompleteSetup)return;
+  const state=this.prepareCatState();
+  state.lastActivity=performance.now();
+  if(state.group==='SleepIn'||state.group==='SleepLoop') {
+    this.startCatStage('SleepOut',1,CAT_SETTINGS.wakeSeconds);
+  }
+};
+
+ma.prototype.playCatAction = function(group,count) {
+  if(this._state!==$.CompleteSetup)return false;
+  const state=this.prepareCatState();
+  if(group==='ShakeHead') {
+    if(state.group==='ShakeHead')return false;
+    if(state.group && state.group.startsWith('Sleep')) {
+      state.queuedShake=true;
+      this.noteCatActivity();
+      return true;
+    }
+  }
+  return this.startCatStage(group,count,CAT_SETTINGS.enterSeconds);
+};
+
+ma.prototype.update = function() {
+  if(this._state!==$.CompleteSetup)return;
+  const delta=Math.min(N.getDeltaTime(),0.1);
+  const state=this.prepareCatState();
+  this._userTimeSeconds+=delta;
+  if(state.stage==='normal' && performance.now()-state.lastActivity>=CAT_SETTINGS.idleDelayMs) {
+    this.startCatStage('SleepIn',1,CAT_SETTINGS.enterSeconds);
+  }
+  if(state.stage==='enter') {
+    state.elapsed+=delta;
+    this.blendCatPose(state.source,state.target,state.elapsed/state.blendSeconds);
+    if(state.elapsed>=state.blendSeconds){state.stage='motion';state.elapsed=0;}
+  } else if(state.stage==='motion') {
+    state.elapsed=Math.min(state.duration,state.elapsed+delta);
+    this.sampleCatMotion(state.group,state.elapsed);
+    if(state.elapsed>=state.duration)state.stage='end';
+  } else if(state.stage==='end') {
+    const group=state.group;
+    state.completed[group]=(state.completed[group]||0)+1;
+    if(group==='ShakeHead' && state.remaining>1) {
+      this.startCatStage(group,state.remaining-1,CAT_SETTINGS.loopBlendSeconds);
+    } else if(group==='SleepIn'||group==='SleepLoop') {
+      this.startCatStage('SleepLoop',1,CAT_SETTINGS.loopBlendSeconds);
+    } else if(group==='SleepOut' && state.queuedShake) {
+      state.queuedShake=false;
+      this.startCatStage('ShakeHead',CAT_SETTINGS.shakeCount,CAT_SETTINGS.enterSeconds);
+    } else this.finishCatAction();
+  } else {
+    this.restoreCatDefaults();
+    this._motionUpdated=false;
+    this._updateScheduler.onLateUpdate(this._model,delta);
+    if(state.stage==='return') {
+      state.elapsed+=delta;
+      this.blendCatPose(state.source,this.captureCatPose(),state.elapsed/CAT_SETTINGS.returnSeconds);
+      if(state.elapsed>=CAT_SETTINGS.returnSeconds){state.stage='normal';state.lastActivity=performance.now();}
+    }
+  }
+  this._model.update();
+};
+
+ha.prototype.onTap = function(x,y) {
+  const model=this._models[0];
+  if(!model||model._state!==$.CompleteSetup)return;
+  const core=model.getModel().getModel();
+  const hit=Array.from(core.drawables.ids).some((id,index)=>
+    core.drawables.opacities[index]>0.05 && model.isHit(j.getIdManager().getId(id),x,y));
+  if(hit)model.playCatAction('ShakeHead',CAT_SETTINGS.shakeCount);
+};
+
+const catPointerMoved = wa.prototype.onPointerMoved;
+wa.prototype.onPointerMoved = function(event) {
+  for (const delegate of this._subdelegates) {
+    delegate.getLive2DManager()?._models[0]?.noteCatActivity();
+  }
+  catPointerMoved.call(this, event);
+};
+wa.prototype.onPointerBegan = function(event) {
+  for (const delegate of this._subdelegates) {
+    delegate.getLive2DManager()?._models[0]?.noteCatActivity();
+    const rect = delegate.getCanvas().getBoundingClientRect();
+    delegate._catPointerDown = event.button === 0 &&
+      event.clientX >= rect.left && event.clientX <= rect.right &&
+      event.clientY >= rect.top && event.clientY <= rect.bottom
+      ? {x: event.clientX, y: event.clientY, id: event.pointerId} : null;
+  }
+};
+wa.prototype.onPointerEnded = function(event) {
+  for (const delegate of this._subdelegates) {
+    delegate.getLive2DManager()?._models[0]?.noteCatActivity();
+    const down = delegate._catPointerDown;
+    delegate._catPointerDown = null;
+    if (!down || down.id !== event.pointerId || Math.hypot(event.clientX-down.x, event.clientY-down.y) > 8) continue;
+    const rect = delegate.getCanvas().getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) continue;
+    delegate._view.onTouchesEnded(event.clientX-rect.left, event.clientY-rect.top);
+  }
+};
+wa.prototype.onPointerCancel = function() {
+  for (const delegate of this._subdelegates) delegate._catPointerDown = null;
+};
+wa.prototype.releaseEventListener = function() {
+  document.removeEventListener('pointerdown', this.pointBeganEventListener);
+  document.removeEventListener('pointermove', this.pointMovedEventListener);
+  document.removeEventListener('pointerup', this.pointEndedEventListener);
+  document.removeEventListener('pointercancel', this.pointCancelEventListener);
+};
+
 document.readyState === `loading` ? window.addEventListener(`load`, Ta, {
   passive: !0,
   once: !0
 }) : Ta(), window.addEventListener(`beforeunload`, () => wa.releaseInstance(), {
   passive: !0
 });
-//# sourceMappingURL=live2d-widget.js.map

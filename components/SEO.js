@@ -285,6 +285,8 @@ export const generateStructuredData = (
   author,
   siteUrl
 ) => {
+  // 修复favicon还老去读已经被私有化了的数据库的路径的问题
+  const seoIcon = siteConfig('BLOG_FAVICON') || siteInfo?.icon
   const baseData = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -300,7 +302,7 @@ export const generateStructuredData = (
       name: siteInfo?.title,
       logo: {
         '@type': 'ImageObject',
-        url: getAbsoluteImageUrl(siteInfo?.icon, siteUrl)
+        url: getAbsoluteImageUrl(seoIcon, siteUrl)
       }
     }
   }
@@ -325,7 +327,7 @@ export const generateStructuredData = (
         name: siteInfo?.title,
         logo: {
           '@type': 'ImageObject',
-          url: getAbsoluteImageUrl(siteInfo?.icon, siteUrl)
+          url: getAbsoluteImageUrl(seoIcon, siteUrl)
         }
       },
       mainEntityOfPage: {

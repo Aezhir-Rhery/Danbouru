@@ -105,3 +105,44 @@ last_edited_time
 ## 维护说明
 
 尽量将自定义修改控制在 Danbouru 主题和少量必要源码修复中，避免直接修改 `node_modules`，以降低后续 Sync Fork 时的冲突风险。
+
+## SEO favicon 自定义备忘
+
+修改文件：
+components/SEO.js
+
+目的：
+让 JSON-LD 里的 publisher.logo.url 优先使用 BLOG_FAVICON，避免继续读取私有 Notion 数据库头像。
+
+核心修改：
+
+1. 在 generateStructuredData() 开头加入：
+
+const seoIcon = siteConfig('BLOG_FAVICON') || siteInfo?.icon
+
+2. 将两处：
+
+url: getAbsoluteImageUrl(siteInfo?.icon, siteUrl)
+
+改为：
+
+url: getAbsoluteImageUrl(seoIcon, siteUrl)
+
+注意：
+以后同步 upstream 时，如果 components/SEO.js 出现 merge conflict：
+
+- 先保留上游对 SEO.js 的新功能
+- 再确认 seoIcon 逻辑仍然存在
+- 如果被覆盖，就重新补回
+
+检查方法：
+
+运行：
+
+yarn dev
+
+打开文章页面，在 HTML 里搜索：
+
+application/ld+json
+
+确认 publisher.logo.url 已经变成 BLOG_FAVICON 对应地址。

@@ -6542,6 +6542,12 @@ ma.prototype.blendCatPose = function(source, target, fraction) {
   source.parts.forEach((value, index) => this._model.setPartOpacityByIndex(index,
     value + (target.parts[index]-value)*weight));
   this._model.setModelOapcity(source.opacity+(target.opacity-source.opacity)*weight);
+  // 入睡第一帧通过 Part5=0 隐藏泡泡，但普通状态通过 S_ParamPao=-1 隐藏。
+  // 同时混合两种隐藏方式会在中途漏出泡泡，因此接入阶段保持部件完全透明。
+  const state = this._catState;
+  if (state?.group === 'SleepIn' && state.stage === 'enter') {
+    this._model.setPartOpacityById(j.getIdManager().getId('Part5'), 0);
+  }
 };
 
 // 使用随包 Cubism SDK 的原生曲线求值器，按准确时间读取原始动作。

@@ -112,6 +112,11 @@
 			"Name": "呼吸"
 		},
 		{
+			"Id": "ParamPa",
+			"GroupId": "ParamGroup",
+			"Name": "啪"
+		},
+		{
 			"Id": "S_ParamPao",
 			"GroupId": "ParamGroup",
 			"Name": "泡泡开关"
@@ -120,6 +125,11 @@
 			"Id": "ParamPao",
 			"GroupId": "ParamGroup",
 			"Name": "泡泡"
+		},
+		{
+			"Id": "ParamPaX",
+			"GroupId": "",
+			"Name": "啪-变大"
 		}
 	],
 	"ParameterGroups": [
@@ -145,6 +155,10 @@
 		}
 	],
 	"Parts": [
+		{
+			"Id": "Part16",
+			"Name": "aru-合层.psd(未找到对应图层)"
+		},
 		{
 			"Id": "Part5",
 			"Name": "泡泡"

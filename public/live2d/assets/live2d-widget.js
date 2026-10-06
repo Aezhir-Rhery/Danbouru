@@ -1,3 +1,32 @@
+/*
+ * aru 网页猫猫：中文学习索引（搜索下面的关键词即可定位）
+ *
+ * 一、Live2D 文件与 JS 的关系
+ * aru.model3.json = 文件入口，列出模型、纹理、物理与动作的路径。
+ * aru.moc3 = 编辑器导出的变形、参数范围与默认值；JS 改参数，模型负责变形。
+ * aru.512/texture_00.png = 实际绘制的图片，需要和 moc3 配套更新。
+ * aru.physics3.json = 输入参数→摆锤→输出参数的关系，例如耳朵/尾尖回弹。
+ * aru.cdi3.json = 参数和部件的显示名称；实际控制要用 ID，不是中文名称。
+ * *.motion3.json = 动画关键帧曲线，记录每个时刻的参数值及部件透明度。
+ * 新增 ParamPa / ParamPaX 已随新 moc3 导入；动画采样会自动处理，
+ * 不需要为每个动画参数再写一条 JS 映射。
+ *
+ * 二、建议阅读顺序（Ctrl+F 搜索）
+ * [学习：鼠标映射] → [学习：呼吸] → CAT_SETTINGS → sampleCatMotion → updateCatCursor。
+ * [学习：尺寸位置] 可修改网页上的宽高和位置。
+ * 普通状态：恢复模型默认值 → 鼠标追踪/呼吸 → 物理运算 → 模型绘制。
+ * 动作状态：当前姿势平滑接入 → 读取动作曲线（含烘焙物理）→ 模型绘制。
+ * 动作期间不叠加实时追踪、呼吸、物理，以免覆盖你制作好的关键帧。
+ *
+ * 三、JS 记号速查
+ * const 声明绑定不再重新赋值的变量；let 声明可重新赋值的变量。
+ * 对象用 {键: 值}，数组用 [项目, 项目]；函数用 function 或 =>。
+ * prototype.xxx = function 给这个类的实例添加/覆盖方法。
+ * this 指当前实例；?. 表示前面存在时再访问；// 和本段都是注释。
+ * SDK 打包后的一些类名仍是短名：ma=模型，ha=模型管理器，wa=网页应用，
+ * j=框架入口，He=鼠标映射项，ze=呼吸设置项。它们不是模型参数 ID。
+ * 前面大段是 SDK 框架；日常调节主要看文件末尾自定义控制器和上述标记。
+ */
 (function() {
   let e = document.createElement(`link`).relList;
   if (e && e.supports && e.supports(`modulepreload`)) return;
@@ -5810,7 +5839,10 @@ var da = class extends la {
         },
         a = () => {
           this._breath = Re.create();
-          // 呼吸待机：中心值、振幅、周期（秒）、权重。
+          // [学习：呼吸] new ze(参数ID, 中心值, 振幅, 周期秒数, 权重)。
+          // 每帧加上 中心值 + 振幅 × sin(时间/周期 × 2π)，然后受参数范围限制。
+          // 当前 ParamBreath 默认0，所以这里的呼吸值在0～1之间，3.5秒一轮。
+          // 耳朵/尾尖如何响应呼吸，仍由 physics3.json 中的输入输出设置决定。
           // 在物理运算之前更新，让尾尖物理读取本帧的呼吸参数。
           let e = [
             new ze(j.getIdManager().getId('ParamBreath'), 0.5, 0.5, 3.5, 1)
@@ -5847,6 +5879,10 @@ var da = class extends la {
           this._state = $.SetupLook, l()
         },
         l = () => {
+          // [学习：鼠标映射] new He(参数ID, 水平系数, 垂直系数, 水平×垂直系数)。
+          // 将鼠标方向换成参数增量：水平系数*x + 垂直系数*y + 交叉系数*x*y。
+          // 负系数反转方向，绝对值越大变化越大，但不会超出模型参数范围。
+          // 这里使用 aru 自己的参数范围；ParamAngleX/Y 是±1，不要直接套用±30。
           this._look = Ve.create();
           let e = [
             new He(j.getIdManager().getId(`ParamAngleX`), 1, 0, 0),
@@ -6482,6 +6518,9 @@ var ba = class {
       this._canvases.length = 1, this._subdelegates.length = 1;
       for (let e = 0; e < 1; e++) {
         let t = document.createElement(`canvas`);
+        // [学习：尺寸位置] CSS像素决定网页占位；纹理分辨率不决定显示大小。
+        // fixed 固定在窗口；left/bottom 分别是离左边/下边的距离。
+        // pointerEvents=none 让画布穿透，鼠标监听与点击判定在后面的控制器处理。
         this._canvases[e] = t, t.style.width = `180px`, t.style.height = `180px`, t.style.position = `fixed`, t.style.left = `25px`, t.style.bottom = `50px`, t.style.zIndex = `50`, t.style.pointerEvents = `none`, document.body.appendChild(t)
       }
       for (let e = 0; e < this._canvases.length; e++) {
@@ -6500,13 +6539,14 @@ var ba = class {
 // ===== 猫猫动作与交互：日后可直接修改这里的配置 =====
 const CAT_SETTINGS = {
   idleDelayMs: 5000, // 测试 5 秒；正式使用改为 15000。
-  shakeCount: 2,
+  shakeCount: 2, // 每次点击完整播放摇头的次数。
   enterSeconds: 0.4, // 从当前姿势过渡到动作第一帧，再开始完整播放。
-  wakeSeconds: 0.3,
-  loopBlendSeconds: 0.12,
-  returnSeconds: 0.35
+  wakeSeconds: 0.3, // 接入苏醒动画的过渡时长（秒）。
+  loopBlendSeconds: 0.12, // 动作重复或睡眠循环衔接的过渡时长。
+  returnSeconds: 0.35 // 动作结束后回到实时追踪的过渡时长。
 };
 
+// [学习] 首次初始化：保存新 moc3 的默认参数（包括嘴巴默认值），并记录活动时间和动画状态。
 ma.prototype.prepareCatState = function() {
   if (this._catState) return this._catState;
   const core = this._model.getModel();
@@ -6521,12 +6561,14 @@ ma.prototype.prepareCatState = function() {
   return this._catState;
 };
 
+// [学习] 拍下当前姿势：参数、部件透明度和整个模型透明度，供平滑过渡使用。
 ma.prototype.captureCatPose = function() {
   const core = this._model.getModel();
   return {values: Array.from(core.parameters.values),
     parts: Array.from(core.parts.opacities), opacity: this._model.getModelOapcity()};
 };
 
+// [学习] 每帧从默认值重新计算，防止上一帧的呼吸/追踪增量不断累加。
 ma.prototype.restoreCatDefaults = function() {
   const state = this.prepareCatState();
   state.defaults.forEach((value, index) => this._model.setParameterValueByIndex(index, value));
@@ -6534,6 +6576,7 @@ ma.prototype.restoreCatDefaults = function() {
   this._model.setModelOapcity(1);
 };
 
+// [学习] 在两套姿势之间渐变；不是物理回弹。fraction从0到1时，由source过渡到target。
 ma.prototype.blendCatPose = function(source, target, fraction) {
   const t = Math.max(0, Math.min(1, fraction));
   const weight = t*t*(3-2*t);
@@ -6552,6 +6595,7 @@ ma.prototype.blendCatPose = function(source, target, fraction) {
 
 // 使用随包 Cubism SDK 的原生曲线求值器，按准确时间读取原始动作。
 // 不再用结束前淡出来混合默认姿势；最后一帧完整显示后才开始下一阶段。
+// [学习] 把动作在指定秒数的曲线值写回模型：Parameter控制变形，PartOpacity控制部件显隐。
 ma.prototype.sampleCatMotion = function(group, time) {
   const data = this._motions.get(group+'_0')._motionData;
   this.restoreCatDefaults();
@@ -6568,6 +6612,7 @@ ma.prototype.sampleCatMotion = function(group, time) {
   }
 };
 
+// [学习] 开始一个动作组。组名须与model3.json中的Motions键对应；从曲线末点计算完整长度。
 ma.prototype.startCatStage = function(group, count, blendSeconds) {
   if (!this._motions.has(group+'_0')) return false;
   const state = this.prepareCatState();
@@ -6590,6 +6635,7 @@ ma.prototype.startCatStage = function(group, count, blendSeconds) {
   return true;
 };
 
+// [学习] 动作结束后恢复实时物理，并平滑回到鼠标追踪姿势。
 ma.prototype.finishCatAction = function() {
   const state=this.prepareCatState();
   state.source=this.captureCatPose();
@@ -6600,6 +6646,7 @@ ma.prototype.finishCatAction = function() {
   this.blendCatPose(state.source,state.source,1);
 };
 
+// [学习] 鼠标活动刷新计时；在入睡/睡眠循环期间活动，则切换到苏醒动画。
 ma.prototype.noteCatActivity = function() {
   if(this._state!==$.CompleteSetup)return;
   const state=this.prepareCatState();
@@ -6609,6 +6656,7 @@ ma.prototype.noteCatActivity = function() {
   }
 };
 
+// [学习] 处理点击请求；正在摇头时不重复触发，睡眠中点击则先醒来，再摇头。
 ma.prototype.playCatAction = function(group,count) {
   if(this._state!==$.CompleteSetup)return false;
   const state=this.prepareCatState();
@@ -6623,6 +6671,7 @@ ma.prototype.playCatAction = function(group,count) {
   return this.startCatStage(group,count,CAT_SETTINGS.enterSeconds);
 };
 
+// [学习] 每帧执行的状态机：normal普通 → enter接入 → motion播放 → end结束；return表示回到追踪。
 ma.prototype.update = function() {
   if(this._state!==$.CompleteSetup)return;
   const delta=Math.min(N.getDeltaTime(),0.1);
@@ -6663,21 +6712,52 @@ ma.prototype.update = function() {
   this._model.update();
 };
 
-ha.prototype.onTap = function(x,y) {
+// [学习：点击区域] 检查当前可见绘制对象的边界框；并非逐像素透明度检测。
+ha.prototype.isCatHit = function(x,y) {
   const model=this._models[0];
-  if(!model||model._state!==$.CompleteSetup)return;
+  if(!model||model._state!==$.CompleteSetup)return false;
   const core=model.getModel().getModel();
-  const hit=Array.from(core.drawables.ids).some((id,index)=>
+  return Array.from(core.drawables.ids).some((id,index)=>
     core.drawables.opacities[index]>0.05 && model.isHit(j.getIdManager().getId(id),x,y));
-  if(hit)model.playCatAction('ShakeHead',CAT_SETTINGS.shakeCount);
+};
+ha.prototype.onTap = function(x,y) {
+  if(this.isCatHit(x,y))this._models[0].playCatAction('ShakeHead',CAT_SETTINGS.shakeCount);
 };
 
+// 画布保持鼠标穿透；仅在猫猫可点击区域临时显示手型。
+let catCursorStyle = null;
+function clearCatCursor() {
+  if(catCursorStyle)catCursorStyle.disabled = true;
+}
+// [学习：手型] 用同一套点击判定控制临时cursor:pointer样式，移出后恢复网页原光标。
+function updateCatCursor(delegates,event) {
+  const hit = event.pointerType !== 'touch' && delegates.some(delegate => {
+    const canvas=delegate.getCanvas(), rect=canvas.getBoundingClientRect();
+    if(!rect.width || !rect.height || event.clientX<rect.left || event.clientX>rect.right ||
+       event.clientY<rect.top || event.clientY>rect.bottom)return false;
+    const x=(event.clientX-rect.left)*canvas.width/rect.width;
+    const y=(event.clientY-rect.top)*canvas.height/rect.height;
+    return delegate.getLive2DManager()?.isCatHit(
+      delegate._view.transformViewX(x),delegate._view.transformViewY(y));
+  });
+  if(hit && !catCursorStyle) {
+    catCursorStyle=document.createElement('style');
+    catCursorStyle.textContent='html, html * { cursor: pointer !important; }';
+    document.head.appendChild(catCursorStyle);
+    window.addEventListener('blur',clearCatCursor);
+    document.addEventListener('pointerout',event => {
+      if(!event.relatedTarget)clearCatCursor();
+    });
+  }
+  if(catCursorStyle)catCursorStyle.disabled=!hit;
+}
 const catPointerMoved = wa.prototype.onPointerMoved;
 wa.prototype.onPointerMoved = function(event) {
   for (const delegate of this._subdelegates) {
     delegate.getLive2DManager()?._models[0]?.noteCatActivity();
   }
   catPointerMoved.call(this, event);
+  updateCatCursor(this._subdelegates,event);
 };
 wa.prototype.onPointerBegan = function(event) {
   for (const delegate of this._subdelegates) {
@@ -6701,9 +6781,11 @@ wa.prototype.onPointerEnded = function(event) {
   }
 };
 wa.prototype.onPointerCancel = function() {
+  clearCatCursor();
   for (const delegate of this._subdelegates) delegate._catPointerDown = null;
 };
 wa.prototype.releaseEventListener = function() {
+  clearCatCursor();
   document.removeEventListener('pointerdown', this.pointBeganEventListener);
   document.removeEventListener('pointermove', this.pointMovedEventListener);
   document.removeEventListener('pointerup', this.pointEndedEventListener);

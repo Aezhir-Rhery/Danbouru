@@ -3,6 +3,10 @@
 
 基于 NotionNext 自定义的个人站点主题。主要修改集中在 `themes/danbouru`，尽量避免改动共享核心代码，以减少后续 Sync Fork 冲突。
 
+## 2026.10.06 重大更新（？）
+加入完全自制的live2D宠物挂件：阿尔猫猫  
+具体详情可见：https://danbouru.cat-fish.net/article/3efb7f05-e444-8044-b8ea-c86e07c77eb6
+
 ## 主要修改
 
 - 将主题根节点从 `theme-onenav` 重命名为 `theme-danbouru`

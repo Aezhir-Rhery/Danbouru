@@ -9,6 +9,8 @@ const CONFIG = {
 
   NAV_SHOW_TITLE_TEXT: false, // 标题栏显示文本
   NAV_USE_CUSTOM_MENU: true, // 使用自定义菜单（可支持子菜单，支持自定义分类图标），若为true则显示所有的category分类
+  DANBOURU_MENU_COLLAPSED:
+  process.env.NEXT_PUBLIC_DANBOURU_MENU_COLLAPSED || '', //增加菜单折叠功能，默认折叠，传入'false'则不折叠
 
   // 菜单
   NAV_MENU_CATEGORY: true, // 显示分类

@@ -1,6 +1,8 @@
 import SmartLink from '@/components/SmartLink'
+import { siteConfig } from '@/lib/config'
 import { useState } from 'react'
 import Collapse from './Collapse'
+import CONFIG from '../config'
 
 /**
  * 菜单
@@ -8,9 +10,16 @@ import Collapse from './Collapse'
  * @returns
  */
 export const MenuItem = ({ link }) => {
-  link.selected = true
+  const collapsedMenus = String(
+    siteConfig('DANBOURU_MENU_COLLAPSED', null, CONFIG) || ''
+  )
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
 
-  const [isOpen, changeIsOpen] = useState(link?.selected)
+  const defaultOpen = !collapsedMenus.includes(link?.title)
+
+  const [isOpen, changeIsOpen] = useState(defaultOpen)
 
   const toggleOpenSubMenu = () => {
     changeIsOpen(!isOpen)
@@ -34,7 +43,9 @@ export const MenuItem = ({ link }) => {
         {link?.subMenus ? (
           <>
             <span className='dark:text-neutral-400 dark:hover:text-white font-bold w-full display-block'>
-              <i className={`text-base ${link?.icon ? link?.icon : ''} mr-1`} />
+              <i
+                className={`text-base ${link?.icon ? link?.icon : ''} mr-1`}
+              />
               {link?.title}
             </span>
             <div className='inline-flex items-center select-none pointer-events-none '>
@@ -47,7 +58,13 @@ export const MenuItem = ({ link }) => {
             href={url}
             className='dark:text-neutral-400 dark:hover:text-white font-bold w-full display-block'>
             <i
-              className={`text-base ${link?.icon ? link?.icon : isAnchor ? 'fas fa-hashtag' : ''} mr-1`}
+              className={`text-base ${
+                link?.icon
+                  ? link?.icon
+                  : isAnchor
+                    ? 'fas fa-hashtag'
+                    : ''
+              } mr-1`}
             />
             {link?.title}
           </SmartLink>
@@ -66,7 +83,13 @@ export const MenuItem = ({ link }) => {
                 <SmartLink href={sUrl}>
                   <span className='dark:text-neutral-400 text-gray-500 hover:text-black dark:hover:text-white text-xs font-bold'>
                     <i
-                      className={`text-xs mr-1 ${sLink?.icon ? sLink?.icon : sIsAnchor ? 'fas fa-hashtag' : ''}`}
+                      className={`text-xs mr-1 ${
+                        sLink?.icon
+                          ? sLink?.icon
+                          : sIsAnchor
+                            ? 'fas fa-hashtag'
+                            : ''
+                      }`}
                     />
                     {sLink.title}
                   </span>

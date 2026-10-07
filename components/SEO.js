@@ -388,7 +388,9 @@ const getSEOMeta = (props, router, locale) => {
   switch (router.route) {
     case '/':
       return {
-        title: `${siteInfo?.title} | ${siteInfo?.description}`,
+        // 首页不要显示简介，简洁一点。
+        title: `${siteInfo?.title}`,
+        // title: `${siteInfo?.title} | ${siteInfo?.description}`,
         description: `${siteInfo?.description}`,
         image: `${siteInfo?.pageCover}`,
         slug: '',

@@ -61,6 +61,9 @@ const Style = () => {
         border-width: inherit !important;
         /* border-style: solid !important; */
     }
+    #theme-danbouru .notion-callout > .notion-callout-text {
+        padding-top: 10px;
+  }
 
     #theme-danbouru input[name='search'] {
         border: 2px solid transparent !important;

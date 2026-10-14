@@ -18,14 +18,46 @@ const BlogPostCard = ({ post, className }) => {
   if (pageIcon?.includes('amazonaws.com')) {
     pageIcon += '&width=88'
   }
-  const getPageIconUrl = icon => {
+const getPageIconUrl = icon => {
   if (!icon || typeof icon !== 'string') return icon
 
-  // Notion 官方公共 icons 不走私有图片代理
-  if (icon.includes('/icons/')) {
-    return icon.replace(
-      /^https?:\/\/[^/]+/,
-      'https://www.notion.so'
+  const proxyHost = 'https://img.danbouru.cat-fish.net'
+  const notionHost = 'https://www.notion.so'
+
+  try {
+    const url = new URL(icon)
+
+    // 正常的 Notion 官方 icon
+    if (
+      icon.startsWith(proxyHost) &&
+      url.pathname.startsWith('/icons/')
+    ) {
+      return notionHost + url.pathname + url.search
+    }
+
+    // 被重复代理后的 Notion 官方 icon
+    if (
+      icon.startsWith(proxyHost) &&
+      url.pathname.startsWith('/image/')
+    ) {
+      const encodedUrl = url.pathname.slice('/image/'.length)
+      const decodedUrl = decodeURIComponent(encodedUrl)
+
+      if (decodedUrl.startsWith(proxyHost + '/icons/')) {
+        const innerUrl = new URL(decodedUrl)
+        const t = url.searchParams.get('t')
+
+        return (
+          notionHost +
+          innerUrl.pathname +
+          (t ? `?t=${t}` : '')
+        )
+      }
+    }
+  } catch (error) {
+    console.warn(
+      '[Danbouru] Failed to normalize page icon:',
+      icon
     )
   }
 

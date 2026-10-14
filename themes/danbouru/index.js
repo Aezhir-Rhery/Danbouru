@@ -19,6 +19,8 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { ArticleLock } from './components/ArticleLock'
 import CONFIG from './config'
 import { Style } from './style'
+// 统一解决notion官方图标URL被代理两次的问题
+import { normalizeNotionIconUrl } from './lib/normalizeNotionIconUrl'
 // import DanbouruLive2D from '@/components/Live2DWidget'
 /* 某次NotionNext更新后图标的URL发生了变化，导致原来的处理逻辑失效。
 为了确保图标能够正确显示，需要对获取标题图标的URL进行更严格的处理。以下是更新后的代码：
@@ -36,54 +38,7 @@ const getTitleIconUrl = icon => {
   return icon
 }
   */
- const getTitleIconUrl = icon => {
-  if (!icon?.startsWith('http')) return icon
 
-  const proxyHost = 'https://img.danbouru.cat-fish.net'
-  const notionHost = 'https://www.notion.so'
-
-  try {
-    const url = new URL(icon)
-
-    // 情况 1：
-    // https://img.danbouru.cat-fish.net/icons/xxx.svg
-    if (
-      icon.startsWith(proxyHost) &&
-      url.pathname.startsWith('/icons/')
-    ) {
-      return notionHost + url.pathname + url.search
-    }
-
-    // 情况 2：
-    // https://img.danbouru.cat-fish.net/image/
-    // https%3A%2F%2Fimg.danbouru.cat-fish.net%2Ficons%2Fxxx.svg...
-    if (
-      icon.startsWith(proxyHost) &&
-      url.pathname.startsWith('/image/')
-    ) {
-      const encodedUrl = url.pathname.slice('/image/'.length)
-      const decodedUrl = decodeURIComponent(encodedUrl)
-
-      if (
-        decodedUrl.startsWith(proxyHost + '/icons/')
-      ) {
-        const innerUrl = new URL(decodedUrl)
-
-        return (
-          notionHost +
-          innerUrl.pathname +
-          (url.searchParams.get('t')
-            ? `?t=${url.searchParams.get('t')}`
-            : '')
-        )
-      }
-    }
-  } catch (error) {
-    console.warn('[Danbouru] Failed to normalize Notion icon:', icon)
-  }
-
-  return icon
-}
 
 const WWAds = dynamic(() => import('@/components/WWAds'), { ssr: false })
 const AdSlot = dynamic(() => import('@/components/GoogleAdsense').then(mod => mod.AdSlot), {
@@ -437,7 +392,9 @@ const LayoutSlug = props => {
             {siteConfig('POST_TITLE_ICON') && post?.pageIcon && (
               post.pageIcon.startsWith('http') ? (
                 <img
-                  src={getTitleIconUrl(post.pageIcon)}
+                  // 避免notion icon的问题
+                  // src={getTitleIconUrl(post.pageIcon)}
+                  src={normalizeNotionIconUrl(post.pageIcon)}
                   alt=''
                   className='w-8 h-8'
                 />

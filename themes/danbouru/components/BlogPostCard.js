@@ -3,6 +3,8 @@ import { isHttpLink } from '@/lib/utils'
 import SmartLink from '@/components/SmartLink'
 import { useRouter } from 'next/router'
 import NotionIcon from './NotionIcon'
+// 统一引入notion官方图标URL的处理函数，避免重复代码
+import { normalizeNotionIconUrl } from '../lib/normalizeNotionIconUrl'
 
 /**
  * 博客卡牌
@@ -18,53 +20,8 @@ const BlogPostCard = ({ post, className }) => {
   if (pageIcon?.includes('amazonaws.com')) {
     pageIcon += '&width=88'
   }
-const getPageIconUrl = icon => {
-  if (!icon || typeof icon !== 'string') return icon
 
-  const proxyHost = 'https://img.danbouru.cat-fish.net'
-  const notionHost = 'https://www.notion.so'
-
-  try {
-    const url = new URL(icon)
-
-    // 正常的 Notion 官方 icon
-    if (
-      icon.startsWith(proxyHost) &&
-      url.pathname.startsWith('/icons/')
-    ) {
-      return notionHost + url.pathname + url.search
-    }
-
-    // 被重复代理后的 Notion 官方 icon
-    if (
-      icon.startsWith(proxyHost) &&
-      url.pathname.startsWith('/image/')
-    ) {
-      const encodedUrl = url.pathname.slice('/image/'.length)
-      const decodedUrl = decodeURIComponent(encodedUrl)
-
-      if (decodedUrl.startsWith(proxyHost + '/icons/')) {
-        const innerUrl = new URL(decodedUrl)
-        const t = url.searchParams.get('t')
-
-        return (
-          notionHost +
-          innerUrl.pathname +
-          (t ? `?t=${t}` : '')
-        )
-      }
-    }
-  } catch (error) {
-    console.warn(
-      '[Danbouru] Failed to normalize page icon:',
-      icon
-    )
-  }
-
-  return icon
-}
-
-const pageIconUrl = getPageIconUrl(pageIcon)
+const pageIconUrl = normalizeNotionIconUrl(pageIcon)
 
 const pageIconIsImage =
   typeof pageIconUrl === 'string' &&

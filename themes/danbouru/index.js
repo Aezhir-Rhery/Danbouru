@@ -20,7 +20,7 @@ import { ArticleLock } from './components/ArticleLock'
 import CONFIG from './config'
 import { Style } from './style'
 // import DanbouruLive2D from '@/components/Live2DWidget'
-
+/*
 const getTitleIconUrl = icon => {
   if (!icon?.startsWith('http')) return icon
 
@@ -30,6 +30,55 @@ const getTitleIconUrl = icon => {
       'https://img.danbouru.cat-fish.net',
       'https://www.notion.so'
     )
+  }
+
+  return icon
+}
+  */
+ const getTitleIconUrl = icon => {
+  if (!icon?.startsWith('http')) return icon
+
+  const proxyHost = 'https://img.danbouru.cat-fish.net'
+  const notionHost = 'https://www.notion.so'
+
+  try {
+    const url = new URL(icon)
+
+    // 情况 1：
+    // https://img.danbouru.cat-fish.net/icons/xxx.svg
+    if (
+      icon.startsWith(proxyHost) &&
+      url.pathname.startsWith('/icons/')
+    ) {
+      return notionHost + url.pathname + url.search
+    }
+
+    // 情况 2：
+    // https://img.danbouru.cat-fish.net/image/
+    // https%3A%2F%2Fimg.danbouru.cat-fish.net%2Ficons%2Fxxx.svg...
+    if (
+      icon.startsWith(proxyHost) &&
+      url.pathname.startsWith('/image/')
+    ) {
+      const encodedUrl = url.pathname.slice('/image/'.length)
+      const decodedUrl = decodeURIComponent(encodedUrl)
+
+      if (
+        decodedUrl.startsWith(proxyHost + '/icons/')
+      ) {
+        const innerUrl = new URL(decodedUrl)
+
+        return (
+          notionHost +
+          innerUrl.pathname +
+          (url.searchParams.get('t')
+            ? `?t=${url.searchParams.get('t')}`
+            : '')
+        )
+      }
+    }
+  } catch (error) {
+    console.warn('[Danbouru] Failed to normalize Notion icon:', icon)
   }
 
   return icon

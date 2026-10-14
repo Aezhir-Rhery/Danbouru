@@ -2,9 +2,9 @@ import Collapse from '@/components/Collapse'
 import DarkModeButton from '@/components/DarkModeButton'
 import throttle from 'lodash.throttle'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import LogoBar from './LogoBar'
 import { MenuBarMobile } from './MenuBarMobile'
 import SearchInput from './SearchInput'
+import Link from 'next/link' // 添加手机端返回首页点击
 
 /**
  * 顶部导航栏 + 菜单
@@ -58,10 +58,25 @@ export default function TopNavBar(props) {
         'fixed top-0 w-full z-40 bg-white dark:bg-neutral-900 shadow bg-opacity-70 dark:bg-opacity-60 backdrop-filter backdrop-blur-lg  md:shadow-none pb-2 md:pb-0 ' +
         className
       }>
-      {/* 图标Logo */}
-      <div className='fixed block md:hidden top-0 left-5 md:left-4 z-40 pt-3 md:pt-4'>
-        <LogoBar {...props} />
-      </div>
+      {/* 移动端 Live2D Logo 占位区；实际 canvas 由 Live2DWidget 创建 */}
+      {/* <div
+        className='fixed block md:hidden top-0 left-2 z-40 w-[96px] h-[72px] pointer-events-none'
+        aria-hidden='true'
+      /> */}
+        {/* 移动端 Live2D Logo 点击区：点击返回首页 */}
+        <Link
+          href='/'
+          aria-label='返回首页'
+          className='fixed block md:hidden left-2 z-[60]'
+          style={{
+            top: '-9px',
+            width: '90px',
+            height: '90px'
+          }}
+          onPointerDown={e => e.stopPropagation()}
+          onPointerUp={e => e.stopPropagation()}
+          onClick={() => window.__danbouruLive2DShake?.()}
+        />
 
       {/* 导航栏菜单 */}
       <div className='h-18 px-5'>

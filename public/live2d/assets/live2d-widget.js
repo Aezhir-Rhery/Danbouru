@@ -6521,7 +6521,7 @@ var ba = class {
         // [学习：尺寸位置] CSS像素决定网页占位；纹理分辨率不决定显示大小。
         // fixed 固定在窗口；left/bottom 分别是离左边/下边的距离。
         // pointerEvents=none 让画布穿透，鼠标监听与点击判定在后面的控制器处理。
-        this._canvases[e] = t, t.style.width = `180px`, t.style.height = `180px`, t.style.position = `fixed`, t.style.left = `25px`, t.style.bottom = `50px`, t.style.zIndex = `50`, t.style.pointerEvents = `none`, document.body.appendChild(t)
+        this._canvases[e] = t, t.style.position = `fixed`, t.style.zIndex = `50`, t.style.pointerEvents = `none`, window.innerWidth < 768 ? (t.style.width = `90px`, t.style.height = `90px`, t.style.left = `2px`, t.style.top = `-9px`, t.style.right = `auto`, t.style.bottom = `auto`) : (t.style.width = `180px`, t.style.height = `180px`, t.style.left = `25px`, t.style.bottom = `50px`, t.style.right = `auto`, t.style.top = `auto`), document.body.appendChild(t)
       }
       for (let e = 0; e < this._canvases.length; e++) {
         let t = new Sa;
@@ -6538,7 +6538,7 @@ var ba = class {
   };
 // ===== 猫猫动作与交互：日后可直接修改这里的配置 =====
 const CAT_SETTINGS = {
-  idleDelayMs: 5000, // 测试 5 秒；正式使用改为 15000。
+  idleDelayMs: 5000, // 无操作 5 秒后进入睡眠。
   shakeCount: 2, // 每次点击完整播放摇头的次数。
   enterSeconds: 0.4, // 从当前姿势过渡到动作第一帧，再开始完整播放。
   wakeSeconds: 0.3, // 接入苏醒动画的过渡时长（秒）。
@@ -6720,8 +6720,19 @@ ha.prototype.isCatHit = function(x,y) {
   return Array.from(core.drawables.ids).some((id,index)=>
     core.drawables.opacities[index]>0.05 && model.isHit(j.getIdManager().getId(id),x,y));
 };
+/* // 不许猫猫在手机端摇头，避免首页 Logo 被误点。
 ha.prototype.onTap = function(x,y) {
   if(this.isCatHit(x,y))this._models[0].playCatAction('ShakeHead',CAT_SETTINGS.shakeCount);
+};
+*/
+ha.prototype.onTap = function(x,y) {
+  // 手机端猫猫作为首页 Logo，不响应 Live2D 点击动作
+  if (window.innerWidth < 768) return;
+
+  // PC 端保持原来的点击摇头
+  if(this.isCatHit(x,y)) {
+    this._models[0].playCatAction('ShakeHead',CAT_SETTINGS.shakeCount);
+  }
 };
 
 // 画布保持鼠标穿透；仅在猫猫可点击区域临时显示手型。
@@ -6752,16 +6763,29 @@ function updateCatCursor(delegates,event) {
   if(catCursorStyle)catCursorStyle.disabled=!hit;
 }
 const catPointerMoved = wa.prototype.onPointerMoved;
+
+// 手机端：用户操作只负责刷新睡眠计时/唤醒，不再参与摇头判断。
 wa.prototype.onPointerMoved = function(event) {
+  const isMobile = window.innerWidth < 768;
+
   for (const delegate of this._subdelegates) {
-    delegate.getLive2DManager()?._models[0]?.noteCatActivity();
+    const model = delegate.getLive2DManager()?._models[0];
+    if (!model) continue;
+    model.noteCatActivity();
   }
-  catPointerMoved.call(this, event);
-  updateCatCursor(this._subdelegates,event);
+
+  // PC 保留原来的鼠标跟随与手型。
+  if (!isMobile) {
+    catPointerMoved.call(this, event);
+    updateCatCursor(this._subdelegates, event);
+  }
 };
+
 wa.prototype.onPointerBegan = function(event) {
   for (const delegate of this._subdelegates) {
-    delegate.getLive2DManager()?._models[0]?.noteCatActivity();
+    const model = delegate.getLive2DManager()?._models[0];
+    model?.noteCatActivity();
+
     const rect = delegate.getCanvas().getBoundingClientRect();
     delegate._catPointerDown = event.button === 0 &&
       event.clientX >= rect.left && event.clientX <= rect.right &&
@@ -6769,23 +6793,65 @@ wa.prototype.onPointerBegan = function(event) {
       ? {x: event.clientX, y: event.clientY, id: event.pointerId} : null;
   }
 };
+
 wa.prototype.onPointerEnded = function(event) {
   for (const delegate of this._subdelegates) {
-    delegate.getLive2DManager()?._models[0]?.noteCatActivity();
+    const model = delegate.getLive2DManager()?._models[0];
+    model?.noteCatActivity();
+
     const down = delegate._catPointerDown;
     delegate._catPointerDown = null;
-    if (!down || down.id !== event.pointerId || Math.hypot(event.clientX-down.x, event.clientY-down.y) > 8) continue;
+
+    if (
+      !down ||
+      down.id !== event.pointerId ||
+      Math.hypot(event.clientX - down.x, event.clientY - down.y) > 8
+    ) {
+      continue;
+    }
+
     const rect = delegate.getCanvas().getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) continue;
-    delegate._view.onTouchesEnded(event.clientX-rect.left, event.clientY-rect.top);
+
+    if (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    ) {
+      continue;
+    }
+
+    delegate._view.onTouchesEnded(
+      event.clientX - rect.left,
+      event.clientY - rect.top
+    );
   }
 };
+
 wa.prototype.onPointerCancel = function() {
   clearCatCursor();
-  for (const delegate of this._subdelegates) delegate._catPointerDown = null;
+  for (const delegate of this._subdelegates) {
+    delegate._catPointerDown = null;
+  }
 };
+
+// 手机端：由顶部 Logo 的点击直接请求摇头。
+// TopNavBar 会同时执行 Next.js 返回首页；Live2D 本身不处理手机端 tap。
+window.__danbouruLive2DShake = function() {
+  if (window.innerWidth >= 768) return false;
+
+  for (const delegate of wa.getInstance()._subdelegates ?? []) {
+    const model = delegate.getLive2DManager()?._models[0];
+    if (!model || model._state !== $.CompleteSetup) continue;
+    return model.playCatAction('ShakeHead', CAT_SETTINGS.shakeCount);
+  }
+
+  return false;
+};
+
 wa.prototype.releaseEventListener = function() {
   clearCatCursor();
+  delete window.__danbouruLive2DShake;
   document.removeEventListener('pointerdown', this.pointBeganEventListener);
   document.removeEventListener('pointermove', this.pointMovedEventListener);
   document.removeEventListener('pointerup', this.pointEndedEventListener);

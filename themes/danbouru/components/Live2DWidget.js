@@ -18,10 +18,8 @@ export default function Live2DWidget() {
       return
     }
 */
-    // 小于 768px 的窗口不显示；平板和电脑显示
-    if (window.innerWidth < 768) {
-      return
-    }
+    // 桌面和手机都加载 Live2D。具体尺寸与位置由 Cubism 端根据窗口宽度决定。
+    window.__danbouruLive2DIsMobile = window.innerWidth < 768
     /*
     if (isMobile()) {
       console.log('[Danbouru Live2D] mobile detected, skip loading')
@@ -46,7 +44,9 @@ export default function Live2DWidget() {
 
       widgetScript.id = 'danbouru-live2d-widget'
       widgetScript.type = 'module'
-      widgetScript.src = '/live2d/assets/live2d-widget.js'
+      // 20261014-1 是版本号，确保浏览器缓存失效
+      // widgetScript.src = '/live2d/assets/live2d-widget.js'
+      widgetScript.src = '/live2d/assets/live2d-widget.js?v=20261014-10'
 
       widgetScript.onload = () => {
         window.__danbouruLive2DLoaded = true

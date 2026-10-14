@@ -20,7 +20,8 @@ import { ArticleLock } from './components/ArticleLock'
 import CONFIG from './config'
 import { Style } from './style'
 // import DanbouruLive2D from '@/components/Live2DWidget'
-/*
+/* 某次NotionNext更新后图标的URL发生了变化，导致原来的处理逻辑失效。
+为了确保图标能够正确显示，需要对获取标题图标的URL进行更严格的处理。以下是更新后的代码：
 const getTitleIconUrl = icon => {
   if (!icon?.startsWith('http')) return icon
 

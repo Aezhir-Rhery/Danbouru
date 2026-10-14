@@ -1439,20 +1439,44 @@ const Style = () => {
     Tab 内容
     ========================= */
 
+    /* 默认：所有内容左右留白 12px */
     #theme-danbouru .notion-tabs-panel {
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 0 12px !important;
 
         border: none !important;
+
+        /* 不再让整个 panel 继承 line-height: 0 */
+        line-height: inherit !important;
+    }
+
+
+    /* =========================
+    只有图片突破左右 padding，撑满 Tab
+    ========================= */
+
+    /* 图片如果是 panel 的一级子元素，就抵消 12px padding */
+    #theme-danbouru .notion-tabs-panel > figure,
+    #theme-danbouru .notion-tabs-panel > .notion-asset-wrapper {
+        display: block !important;
+
+        width: calc(100% + 24px) !important;
+        max-width: none !important;
+
+        margin-left: -12px !important;
+        margin-right: -12px !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+
+        padding: 0 !important;
 
         line-height: 0 !important;
     }
 
-    /* 图片容器 */
-    #theme-danbouru .notion-tabs-panel figure,
-    #theme-danbouru .notion-tabs-panel .notion-asset-wrapper {
-        display: block !important;
 
+    /* 图片内部容器保持无额外间距 */
+    #theme-danbouru .notion-tabs-panel figure .notion-asset-wrapper,
+    #theme-danbouru .notion-tabs-panel .notion-asset-wrapper > div {
         width: 100% !important;
         max-width: none !important;
 
@@ -1462,15 +1486,8 @@ const Style = () => {
         line-height: 0 !important;
     }
 
-    /* react-notion-x 图片内部容器 */
-    #theme-danbouru .notion-tabs-panel .notion-asset-wrapper > div {
-        margin: 0 !important;
-        padding: 0 !important;
 
-        line-height: 0 !important;
-    }
-
-    /* 图片 */
+    /* 图片本身撑满 */
     #theme-danbouru .notion-tabs-panel img {
         display: block !important;
 

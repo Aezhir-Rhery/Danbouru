@@ -5,7 +5,7 @@
 
 ## 2026.10.06 重大更新（？）
 加入完全自制的live2D宠物挂件：阿尔猫猫  
-具体详情可见：https://danbouru.cat-fish.net/article/3efb7f05-e444-8044-b8ea-c86e07c77eb6
+具体详情可见：[https://danbouru.cat-fish.net/article/3efb7f05-e444-8044-b8ea-c86e07c77eb6](https://danbouru.cat-fish.net/article/live2d-aru-widget)
 
 ## 主要修改
 
@@ -105,6 +105,8 @@ last_edited_time
 ## 维护说明
 
 尽量将自定义修改控制在 Danbouru 主题和少量必要源码修复中，避免直接修改 `node_modules`，以降低后续 Sync Fork 时的冲突风险。
+出事就去原仓库找办法：
+https://github.com/notionnext-org/NotionNext
 
 ## SEO favicon 自定义备忘
 

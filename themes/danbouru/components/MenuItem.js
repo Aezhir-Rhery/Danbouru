@@ -1,4 +1,4 @@
-import SmartLink from '@/components/SmartLink'
+import MenuLink from './MenuLink'
 import { siteConfig } from '@/lib/config'
 import { useState } from 'react'
 import Collapse from './Collapse'
@@ -54,7 +54,7 @@ export const MenuItem = ({ link }) => {
             </div>
           </>
         ) : (
-          <SmartLink
+          <MenuLink
             href={url}
             className='dark:text-neutral-400 dark:hover:text-white font-bold w-full display-block'>
             <i
@@ -67,7 +67,7 @@ export const MenuItem = ({ link }) => {
               } mr-1`}
             />
             {link?.title}
-          </SmartLink>
+          </MenuLink>
         )}
       </div>
 
@@ -80,7 +80,7 @@ export const MenuItem = ({ link }) => {
             const sUrl = sIsAnchor ? `#${sLink.name}` : sLink.href
             return (
               <div key={index} className='nav-submenu'>
-                <SmartLink href={sUrl}>
+                <MenuLink href={sUrl}>
                   <span className='dark:text-neutral-400 text-gray-500 hover:text-black dark:hover:text-white text-xs font-bold'>
                     <i
                       className={`text-xs mr-1 ${
@@ -93,7 +93,7 @@ export const MenuItem = ({ link }) => {
                     />
                     {sLink.title}
                   </span>
-                </SmartLink>
+                </MenuLink>
               </div>
             )
           })}

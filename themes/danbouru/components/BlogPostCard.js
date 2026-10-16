@@ -69,7 +69,7 @@ const pageIconIsImage =
           )}
           <div className='stack-comment flex-auto'>
             <p className='title font-bold'>{post.title}</p>
-            <p className='description font-normal'>
+            <p className='description font-normal' style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {post.summary ? post.summary : '暂无简介'}
             </p>
           </div>

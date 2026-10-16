@@ -1,4 +1,5 @@
 const CONFIG = {
+  DANBOURU_HOME_HIDDEN_CATEGORIES: ['この行為は禁じられています'], // 仅首页隐藏；分类页和归档保留
   NAV_COLOR_BG: '#fbfbfb',
   NAV_COLOR_TEXT: '#8c8c8c',
   NAV_COLOR_TEXT_HOVER: '#000000',

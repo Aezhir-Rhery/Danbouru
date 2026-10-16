@@ -1187,12 +1187,23 @@ const Style = () => {
 
     /* summary 本体：让图标和文字垂直对齐 */
     #theme-danbouru .notion-toggle > summary {
-        display: flex !important;
+        display: inline-flex !important;
         align-items: center !important;
+        width: fit-content !important;
+        max-width: 100%;
+        min-height: 0 !important;
+        padding: 0 !important;
+        gap: 6px;
 
         list-style: none !important;
 
         cursor: pointer;
+    }
+
+    #theme-danbouru .notion-toggle > summary :is(h1, h2, h3, h4, h5, .notion-h, .notion-h-title) {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: inherit;
     }
 
     /* 隐藏浏览器默认小三角 */
@@ -1215,7 +1226,7 @@ const Style = () => {
         width: 1em;
         height: 1em;
 
-        margin-right: 6px;
+        margin-right: 0;
 
         font-family: "Font Awesome 6 Free";
         font-weight: 900;

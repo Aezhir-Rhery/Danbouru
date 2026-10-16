@@ -4,6 +4,7 @@ import { useNavGlobal } from '@/themes/danbouru'
 import CONFIG from '../config'
 import BlogPostItem from './BlogPostItem'
 import BlogPostListEmpty from './BlogPostListEmpty'
+import { useRouter } from 'next/router'
 
 /**
  * 博客列表滚动分页
@@ -15,6 +16,12 @@ import BlogPostListEmpty from './BlogPostListEmpty'
 const BlogPostListAll = (props) => {
   const { customMenu } = props
   const { filteredNavPages, setFilteredNavPages, allNavPages } = useNavGlobal()
+  const router = useRouter()
+  const hiddenCategories = siteConfig('DANBOURU_HOME_HIDDEN_CATEGORIES', CONFIG.DANBOURU_HOME_HIDDEN_CATEGORIES, props.NOTION_CONFIG)
+  const hiddenCategoryNames = Array.isArray(hiddenCategories) ? hiddenCategories : String(hiddenCategories || '').split(',').map(name => name.trim()).filter(Boolean)
+  const visiblePages = router.pathname === '/'
+    ? filteredNavPages?.filter(post => !hiddenCategoryNames.includes(post.category))
+    : filteredNavPages
 
   // 对自定义分类格式化，方便后续使用分类名称做索引，检索同步图标信息
   // 目前只支持二级分类
@@ -36,7 +43,7 @@ const BlogPostListAll = (props) => {
   })
 
   const selectedSth = false
-  const groupedArray = filteredNavPages?.reduce((groups, item) => {
+  const groupedArray = visiblePages?.reduce((groups, item) => {
     const categoryName = item?.category ? item?.category : '' // 将category转换为字符串
     const categoryIcon = filterLinks[categoryName]?.icon ? filterLinks[categoryName]?.icon : '' // 将pageIcon转换为字符串
     let existingGroup = null

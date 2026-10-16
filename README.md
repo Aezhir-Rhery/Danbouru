@@ -5,7 +5,7 @@
 
 ## 2026.10.06 重大更新（？）
 加入完全自制的live2D宠物挂件：阿尔猫猫  
-具体详情可见：[https://danbouru.cat-fish.net/article/3efb7f05-e444-8044-b8ea-c86e07c77eb6](https://danbouru.cat-fish.net/article/live2d-aru-widget)
+具体详情可见：https://danbouru.cat-fish.net/article/live2d-aru-widget
 
 ## 主要修改
 

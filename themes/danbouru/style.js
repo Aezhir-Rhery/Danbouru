@@ -816,6 +816,47 @@ const Style = () => {
     .nav-submenu a > span > i {
         margin-right: 10px;
     }
+    #theme-danbouru .danbouru-gallery { container-type: inline-size; }
+    #theme-danbouru .danbouru-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 200px));
+        gap: 24px;
+        align-items: start;
+    }
+    #theme-danbouru .danbouru-gallery-card {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+        border-radius: var(--danbouru-radius-md);
+        text-decoration: none;
+    }
+    #theme-danbouru .danbouru-gallery-media { width: 100%; background: var(--danbouru-line); }
+    #theme-danbouru .danbouru-gallery-media img { display: block; width: 100%; height: auto; margin: 0; }
+    #theme-danbouru .danbouru-gallery-empty {
+        display: grid;
+        place-items: center;
+        aspect-ratio: 3 / 4;
+        font-size: 14px;
+    }
+    #theme-danbouru .danbouru-gallery-copy { padding: 14px 16px; min-width: 0; }
+    #theme-danbouru .danbouru-gallery-summary {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+    }
+    @container (min-width: 1100px) {
+        #theme-danbouru .danbouru-gallery-grid { grid-template-columns: repeat(4, minmax(0, 200px)); }
+    }
+    @media (max-width: 767px) {
+        #theme-danbouru .danbouru-gallery-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+        #theme-danbouru .danbouru-gallery-card { flex-direction: row; align-items: flex-start; }
+        #theme-danbouru .danbouru-gallery-media { width: 34%; flex: 0 0 34%; }
+        #theme-danbouru .danbouru-gallery-copy { flex: 1; padding: 14px 12px; }
+        #theme-danbouru .danbouru-gallery-summary { -webkit-line-clamp: 4; }
+    }
     .card {
         /* 首页文章列表 */
         cursor: pointer;

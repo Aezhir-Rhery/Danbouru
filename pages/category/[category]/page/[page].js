@@ -1,4 +1,5 @@
 import BLOG from '@/blog.config'
+import { isGalleryPage, addGalleryImages } from '@/lib/db/notion/galleryPosts'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 import { DynamicLayout } from '@/themes/theme'
@@ -23,14 +24,17 @@ export async function getStaticProps({ params: { category, page } }) {
     ?.filter(page => page.type === 'Post' && page.status === 'Published')
     .filter(post => post && post.category && post.category.includes(category))
   // 处理文章页数
+  props.galleryMode = isGalleryPage(props, { category })
+  if (props.galleryMode) props.posts = [...props.posts].sort((a, b) => b.publishDate - a.publishDate)
   props.postCount = props.posts.length
   const POSTS_PER_PAGE = siteConfig('POSTS_PER_PAGE', 12, props?.NOTION_CONFIG)
   // 处理分页
-  props.posts = props.posts.slice(
+  if (!props.galleryMode) props.posts = props.posts.slice(
     POSTS_PER_PAGE * (page - 1),
     POSTS_PER_PAGE * page
   )
 
+  if (props.galleryMode) await addGalleryImages(props)
   delete props.allPages
   props.page = page
 

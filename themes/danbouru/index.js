@@ -18,6 +18,7 @@ import { useRouter } from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { ArticleLock } from './components/ArticleLock'
 import CONFIG from './config'
+import BlogGallery from './components/BlogGallery'
 import { Style } from './style'
 // 统一解决notion官方图标URL被代理两次的问题
 import { normalizeNotionIconUrl } from './lib/normalizeNotionIconUrl'
@@ -198,7 +199,7 @@ const LayoutBase = props => {
             className='flex flex-col justify-between w-full relative z-10 pt-20 md:pt-5 pb-8 min-h-screen overflow-y-auto'>
             <div
               id='container-inner'
-              className='w-full px-6 pb-6 md:pb-20 max-w-8xl justify-center mx-auto'>
+              className={`w-full px-6 pb-6 md:pb-20 max-w-8xl justify-center ${props.galleryMode ? 'mx-0' : 'mx-auto'}`}>
               {slotTop}
               {/* 广告植入 */}
               <WWAds className='w-full' orientation='horizontal' />
@@ -321,7 +322,7 @@ const LayoutPostList = props => {
 
   return (
     <>
-      <div className='w-full max-w-7xl mx-auto justify-center mt-12'>
+      <div className={`w-full max-w-7xl justify-center mt-12 ${props.galleryMode ? 'mx-0' : 'mx-auto'}`}>
 
         {/* Tag 文章结果标题 */}
         {currentTag && (
@@ -339,13 +340,17 @@ const LayoutPostList = props => {
           </h1>
         )}
 
-        <div
-          id='posts-wrapper'
-          className='card-list grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-          {posts?.map(post => (
-            <BlogPostCard key={post.id} post={post} className='card' />
-          ))}
-        </div>
+        {props.galleryMode ? (
+          <BlogGallery posts={posts} />
+        ) : (
+          <div
+            id='posts-wrapper'
+            className='card-list grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
+            {posts?.map(post => (
+              <BlogPostCard key={post.id} post={post} className='card' />
+            ))}
+          </div>
+        )}
       </div>
     </>
   )

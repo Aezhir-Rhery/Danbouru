@@ -19,6 +19,8 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { ArticleLock } from './components/ArticleLock'
 import CONFIG from './config'
 import BlogGallery from './components/BlogGallery'
+import PaginationSimple from './components/PaginationSimple'
+import { GALLERY_PAGE_SIZE } from './lib/gallery'
 import { Style } from './style'
 // 统一解决notion官方图标URL被代理两次的问题
 import { normalizeNotionIconUrl } from './lib/normalizeNotionIconUrl'
@@ -341,7 +343,15 @@ const LayoutPostList = props => {
         )}
 
         {props.galleryMode ? (
-          <BlogGallery posts={posts} />
+          <div className='danbouru-gallery-layout'>
+            <BlogGallery posts={posts} />
+            {props.postCount > GALLERY_PAGE_SIZE && (
+              <PaginationSimple
+                page={props.page || 1}
+                totalPage={Math.ceil(props.postCount / GALLERY_PAGE_SIZE)}
+              />
+            )}
+          </div>
         ) : (
           <div
             id='posts-wrapper'

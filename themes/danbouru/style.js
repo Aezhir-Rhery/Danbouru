@@ -816,28 +816,133 @@ const Style = () => {
     .nav-submenu a > span > i {
         margin-right: 10px;
     }
+    #theme-danbouru .danbouru-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin: 32px 0;
+        color: #6b7280;
+        font-size: 1.1rem;
+        font-weight: 300;
+        line-height: 1.3;
+    }
+    .dark #theme-danbouru .danbouru-pagination,
+    #theme-danbouru.dark .danbouru-pagination { color: #9ca3af; }
+    #theme-danbouru .danbouru-pagination-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        padding: 0;
+        color: inherit;
+        text-decoration: none;
+        border: 0;
+    }
+    #theme-danbouru .danbouru-pagination-next { margin-left: auto; }
+    #theme-danbouru .danbouru-pagination-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        flex: 0 0 18px;
+        color: inherit;
+        line-height: 1;
+    }
+    #theme-danbouru .danbouru-pagination-prev { transform: rotate(180deg); }
+    #theme-danbouru .danbouru-pagination-link:focus-visible {
+        outline: 2px solid var(--danbouru-accent);
+        outline-offset: 4px;
+        border-radius: 2px;
+    }
+    #theme-danbouru .danbouru-gallery-layout { container-type: inline-size; }
+    #theme-danbouru .danbouru-gallery-layout > .danbouru-pagination {
+        width: 100%;
+        max-width: 648px;
+    }
     #theme-danbouru .danbouru-gallery { container-type: inline-size; }
     #theme-danbouru .danbouru-gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 200px));
-        gap: 24px;
-        align-items: start;
+        column-count: 3;
+        column-gap: 24px;
+        max-width: 648px;
     }
     #theme-danbouru .danbouru-gallery-card {
+        --gallery-surface: #ffffff;
         display: flex;
         flex-direction: column;
+        break-inside: avoid;
+        margin-bottom: 24px;
+        background: var(--gallery-surface);
         min-width: 0;
         overflow: hidden;
         border-radius: var(--danbouru-radius-md);
         text-decoration: none;
     }
-    #theme-danbouru .danbouru-gallery-media { width: 100%; background: var(--danbouru-line); }
-    #theme-danbouru .danbouru-gallery-media img { display: block; width: 100%; height: auto; margin: 0; }
+    .dark #theme-danbouru .danbouru-gallery-card,
+    #theme-danbouru.dark .danbouru-gallery-card {
+        --gallery-surface: #262626;
+    }
+    #theme-danbouru .danbouru-gallery-media {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: transparent;
+    }
+    #theme-danbouru .danbouru-gallery-cover {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-position: center;
+        margin: 0;
+    }
+    #theme-danbouru .danbouru-gallery-cover.is-long {
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        object-position: center top;
+    }
+    #theme-danbouru .danbouru-gallery-crop-fade {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 42px;
+        background: linear-gradient(transparent, var(--gallery-surface) 85%);
+        pointer-events: none;
+    }
+    #theme-danbouru .danbouru-gallery-count {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        display: grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: #cb912f;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+    }
     #theme-danbouru .danbouru-gallery-empty {
         display: grid;
         place-items: center;
         aspect-ratio: 3 / 4;
+        height: 100%;
         font-size: 14px;
+    }
+    #theme-danbouru .danbouru-gallery-empty .danbouru-gallery-icon {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        font-size: 48px;
+        line-height: 64px;
+        text-align: center;
+        margin: 0;
     }
     #theme-danbouru .danbouru-gallery-copy { padding: 14px 16px; min-width: 0; }
     #theme-danbouru .danbouru-gallery-summary {
@@ -848,14 +953,24 @@ const Style = () => {
         overflow-wrap: anywhere;
     }
     @container (min-width: 1100px) {
-        #theme-danbouru .danbouru-gallery-grid { grid-template-columns: repeat(4, minmax(0, 200px)); }
+        #theme-danbouru .danbouru-gallery-layout > .danbouru-pagination { max-width: 872px; }
+        #theme-danbouru .danbouru-gallery-grid { column-count: 4; max-width: 872px; }
     }
     @media (max-width: 767px) {
-        #theme-danbouru .danbouru-gallery-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-        #theme-danbouru .danbouru-gallery-card { flex-direction: row; align-items: flex-start; }
+        #theme-danbouru .danbouru-gallery-layout > .danbouru-pagination { max-width: none; }
+        #theme-danbouru .danbouru-gallery-grid { column-count: 1; max-width: none; }
+        #theme-danbouru .danbouru-gallery-card { flex-direction: row; align-items: flex-start; margin-bottom: 20px; }
         #theme-danbouru .danbouru-gallery-media { width: 34%; flex: 0 0 34%; }
         #theme-danbouru .danbouru-gallery-copy { flex: 1; padding: 14px 12px; }
         #theme-danbouru .danbouru-gallery-summary { -webkit-line-clamp: 4; }
+        #theme-danbouru .stack-comment .title,
+        #theme-danbouru .danbouru-gallery-copy .title {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            overflow-wrap: anywhere;
+        }
     }
     .card {
         /* 首页文章列表 */

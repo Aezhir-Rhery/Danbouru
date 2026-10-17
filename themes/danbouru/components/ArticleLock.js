@@ -12,9 +12,11 @@ export const ArticleLock = props => {
   const { validPassword } = props
   const { locale } = useGlobal()
 
-  const submitPassword = () => {
+  const submitPassword = async () => {
     const p = document.getElementById('password')
-    if (!validPassword(p?.value)) {
+    const isValid = await validPassword(p?.value)
+
+    if (!isValid) {
       const tips = document.getElementById('tips')
       if (tips) {
         tips.innerHTML = ''

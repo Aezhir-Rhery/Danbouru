@@ -1,4 +1,5 @@
 import BLOG from '@/blog.config'
+import { paginateGalleryPosts } from '@/themes/danbouru/lib/gallery'
 import { isGalleryPage, addGalleryImages } from '@/lib/db/notion/galleryPosts'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
@@ -29,7 +30,6 @@ export async function getStaticProps({ params: { category }, locale }) {
 
   // 处理文章页数
   props.galleryMode = isGalleryPage(props, { category })
-  if (props.galleryMode) props.posts = [...props.posts].sort((a, b) => b.publishDate - a.publishDate)
   props.postCount = props.posts.length
   // 处理分页
   const POST_LIST_STYLE = siteConfig(
@@ -37,7 +37,9 @@ export async function getStaticProps({ params: { category }, locale }) {
     'page',
     props?.NOTION_CONFIG
   )
-  if (props.galleryMode || POST_LIST_STYLE === 'scroll') {
+  if (props.galleryMode) {
+    props.posts = paginateGalleryPosts(props.posts)
+  } else if (POST_LIST_STYLE === 'scroll') {
     // 滚动列表 给前端返回所有数据
   } else if (POST_LIST_STYLE === 'page') {
     props.posts = props.posts?.slice(

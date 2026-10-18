@@ -1,4 +1,5 @@
 import BLOG from '@/blog.config'
+import { GALLERY_PAGE_SIZE, paginateGalleryPosts } from '@/themes/danbouru/lib/gallery'
 import { isGalleryPage, addGalleryImages } from '@/lib/db/notion/galleryPosts'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
@@ -15,9 +16,9 @@ export default function Category(props) {
   return <DynamicLayout theme={theme} layoutName='LayoutPostList' {...props} />
 }
 
-export async function getStaticProps({ params: { category, page } }) {
+export async function getStaticProps({ params: { category, page }, locale }) {
   const from = 'category-page-props'
-  let props = await fetchGlobalAllData({ from })
+  let props = await fetchGlobalAllData({ from, locale })
 
   // 过滤状态类型
   props.posts = props.allPages
@@ -25,11 +26,11 @@ export async function getStaticProps({ params: { category, page } }) {
     .filter(post => post && post.category && post.category.includes(category))
   // 处理文章页数
   props.galleryMode = isGalleryPage(props, { category })
-  if (props.galleryMode) props.posts = [...props.posts].sort((a, b) => b.publishDate - a.publishDate)
   props.postCount = props.posts.length
   const POSTS_PER_PAGE = siteConfig('POSTS_PER_PAGE', 12, props?.NOTION_CONFIG)
   // 处理分页
-  if (!props.galleryMode) props.posts = props.posts.slice(
+  if (props.galleryMode) props.posts = paginateGalleryPosts(props.posts, page)
+  else props.posts = props.posts.slice(
     POSTS_PER_PAGE * (page - 1),
     POSTS_PER_PAGE * page
   )
@@ -69,7 +70,9 @@ export async function getStaticPaths() {
     // 处理文章页数
     const postCount = categoryPosts.length
     const totalPages = Math.ceil(
-      postCount / siteConfig('POSTS_PER_PAGE', null, NOTION_CONFIG)
+      postCount / (isGalleryPage({ NOTION_CONFIG }, { category: category.name })
+        ? GALLERY_PAGE_SIZE
+        : siteConfig('POSTS_PER_PAGE', 12, NOTION_CONFIG))
     )
     if (totalPages > 1) {
       for (let i = 1; i <= totalPages; i++) {

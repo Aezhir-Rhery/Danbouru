@@ -885,6 +885,7 @@ const Style = () => {
     }
     #theme-danbouru .danbouru-gallery-media {
         position: relative;
+        isolation: isolate;
         width: 100%;
         overflow: hidden;
         flex-shrink: 0;
@@ -904,6 +905,7 @@ const Style = () => {
     }
     #theme-danbouru .danbouru-gallery-crop-fade {
         position: absolute;
+        z-index: 1;
         left: 0;
         right: 0;
         bottom: 0;
@@ -913,14 +915,19 @@ const Style = () => {
     }
     #theme-danbouru .danbouru-gallery-count {
         position: absolute;
-        right: 8px;
-        bottom: 8px;
+        z-index: 2;
+        right: 0;
+        bottom: 0;
         display: grid;
         place-items: center;
+        box-sizing: border-box;
         width: 30px;
         height: 30px;
-        border-radius: 7px;
-        background: #cb912f;
+        /* Center the number at the triangle's centroid (20px, 20px). */
+        padding: 10px 0 0 10px;
+        text-align: center;
+        /* Avoid clip-path antialiasing along the flush right/bottom edges. */
+        background: linear-gradient(135deg, transparent 50%, #cb912f 50%);
         color: white;
         font-size: 13px;
         font-weight: 700;

@@ -10,23 +10,37 @@ export function paginateGalleryPosts(posts = [], page = 1) {
     .slice((currentPage - 1) * GALLERY_PAGE_SIZE, currentPage * GALLERY_PAGE_SIZE)
 }
 
+export function galleryNames(value) {
+  if (Array.isArray(value)) {
+    return [...new Set(value.filter(name => typeof name === 'string').map(name => name.trim()).filter(Boolean))]
+  }
+  if (typeof value !== 'string') return []
+  const normalized = value.trim()
+  try {
+    const parsed = JSON.parse(normalized)
+    if (Array.isArray(parsed)) return galleryNames(parsed)
+  } catch (_) {
+    // Accept common Notion text formats without evaluating configuration as code.
+  }
+  const list = normalized.replace(/^\s*\[/, '').replace(/\]\s*$/, '')
+  return [...new Set(list.split(/[,，\n]/).map(name => name.trim().replace(/^["']|["']$/g, '').trim()).filter(Boolean))]
+}
+
+export function homeHiddenCategories(config = {}) {
+  return [...new Set([
+    ...galleryNames(config.DANBOURU_GALLERY_CATEGORIES ?? CONFIG.DANBOURU_GALLERY_CATEGORIES),
+    ...galleryNames(config.DANBOURU_HOME_HIDDEN_CATEGORIES ?? CONFIG.DANBOURU_HOME_HIDDEN_CATEGORIES)
+  ])]
+}
+
 export function galleryEnabled(config = {}, taxonomy) {
-  const names = value =>
-    Array.isArray(value)
-      ? value
-      : typeof value === 'string'
-        ? value
-            .split(/[,，\n]/)
-            .map(name => name.trim())
-            .filter(Boolean)
-        : []
   return Boolean(
     (taxonomy.category &&
-      names(
+      galleryNames(
         config.DANBOURU_GALLERY_CATEGORIES ?? CONFIG.DANBOURU_GALLERY_CATEGORIES
       ).includes(taxonomy.category)) ||
     (taxonomy.tag &&
-      names(
+      galleryNames(
         config.DANBOURU_GALLERY_TAGS ?? CONFIG.DANBOURU_GALLERY_TAGS
       ).includes(taxonomy.tag))
   )

@@ -5,6 +5,7 @@ import CONFIG from '../config'
 import BlogPostItem from './BlogPostItem'
 import BlogPostListEmpty from './BlogPostListEmpty'
 import { useRouter } from 'next/router'
+import { galleryNames, homeHiddenCategories } from '../lib/gallery'
 
 /**
  * 博客列表滚动分页
@@ -17,10 +18,12 @@ const BlogPostListAll = (props) => {
   const { customMenu } = props
   const { filteredNavPages, setFilteredNavPages, allNavPages } = useNavGlobal()
   const router = useRouter()
-  const hiddenCategories = siteConfig('DANBOURU_HOME_HIDDEN_CATEGORIES', CONFIG.DANBOURU_HOME_HIDDEN_CATEGORIES, props.NOTION_CONFIG)
-  const hiddenCategoryNames = Array.isArray(hiddenCategories) ? hiddenCategories : String(hiddenCategories || '').split(',').map(name => name.trim()).filter(Boolean)
+  const hiddenCategoryNames = homeHiddenCategories({
+    DANBOURU_GALLERY_CATEGORIES: siteConfig('DANBOURU_GALLERY_CATEGORIES', CONFIG.DANBOURU_GALLERY_CATEGORIES, props.NOTION_CONFIG),
+    DANBOURU_HOME_HIDDEN_CATEGORIES: siteConfig('DANBOURU_HOME_HIDDEN_CATEGORIES', CONFIG.DANBOURU_HOME_HIDDEN_CATEGORIES, props.NOTION_CONFIG)
+  })
   const visiblePages = router.pathname === '/'
-    ? filteredNavPages?.filter(post => !hiddenCategoryNames.includes(post.category))
+    ? filteredNavPages?.filter(post => !galleryNames(post.category).some(category => hiddenCategoryNames.includes(category)))
     : filteredNavPages
 
   // 对自定义分类格式化，方便后续使用分类名称做索引，检索同步图标信息

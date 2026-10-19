@@ -18,6 +18,7 @@ import { useRouter } from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { ArticleLock } from './components/ArticleLock'
 import CONFIG from './config'
+import HomeTopics from './components/HomeTopics'
 import BlogGallery from './components/BlogGallery'
 import PaginationSimple from './components/PaginationSimple'
 import { GALLERY_PAGE_SIZE } from './lib/gallery'
@@ -268,6 +269,7 @@ const LayoutPostListIndex = props => {
   return (
     <>
       <Announcement {...props} />
+      <HomeTopics />
       <BlogPostListAll {...props} />
     </>
   )

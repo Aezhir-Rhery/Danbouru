@@ -816,6 +816,48 @@ const Style = () => {
     .nav-submenu a > span > i {
         margin-right: 10px;
     }
+    /* 首页 topic 图片：桌面 3 + 2，手机单列，图片最大宽度 250px。 */
+    #theme-danbouru .danbouru-home-topics {
+        width: 100%;
+        max-width: 798px;
+        margin: 24px 0 32px;
+    }
+    #theme-danbouru .danbouru-home-topics-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 250px));
+        gap: 24px;
+        align-items: start;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    #theme-danbouru .danbouru-home-topics-grid > li {
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+    }
+    #theme-danbouru .danbouru-home-topic-link {
+        display: block;
+        width: 100%;
+        max-width: 250px;
+    }
+    #theme-danbouru .danbouru-home-topic-link:focus-visible {
+        outline: 2px solid var(--danbouru-accent);
+        outline-offset: 4px;
+    }
+    #theme-danbouru .danbouru-home-topic-image {
+        display: block;
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+        margin: 0;
+    }
+    @media (max-width: 767px) {
+        #theme-danbouru .danbouru-home-topics-grid {
+            grid-template-columns: minmax(0, 250px);
+            gap: 20px;
+        }
+    }
     #theme-danbouru .danbouru-pagination {
         display: flex;
         align-items: center;

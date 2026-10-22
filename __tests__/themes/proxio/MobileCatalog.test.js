@@ -23,7 +23,7 @@ jest.mock('notion-utils', () => ({
   uuidToId: id => String(id).replace(/-/g, '').slice(0, 8)
 }))
 
-jest.mock('lib/utils/throttle', () => ({
+jest.mock('lodash.throttle', () => ({
   __esModule: true,
   default: fn => {
     const wrapped = (...args) => fn(...args)

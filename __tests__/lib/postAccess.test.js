@@ -379,3 +379,17 @@ it('allows an unprotected child of an Invisible catalog page without a password'
   expect(props.post.password).toBeFalsy()
   expect(JSON.stringify(props.post)).toContain(marker)
 })
+
+it('serializes missing navigation when public body loading fails during build', async () => {
+  const cached = await getOrSetDataWithCache()
+  cached.allPages[0].password = ''
+  fetchNotionPageBlocks.mockRejectedValueOnce(new Error('Body unavailable'))
+  const props = await resolvePostProps({ ...options, revalidateReason: 'build' })
+  expect(props.prev).toBeNull()
+  expect(props.next).toBeNull()
+  expect(props.recommendPosts).toEqual([])
+  const { isSerializableProps } = require('next/dist/lib/is-serializable-props')
+  expect(isSerializableProps('/public', 'getStaticProps', {
+    prev: props.prev, next: props.next, recommendPosts: props.recommendPosts
+  })).toBe(true)
+})

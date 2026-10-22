@@ -1,3 +1,4 @@
+import { uuidPostRedirect } from '@/lib/utils/uuidPostRedirect'
 import BLOG from '@/blog.config'
 import useNotification from '@/components/Notification'
 import TechGrow from '@/components/TechGrow'
@@ -72,6 +73,9 @@ export async function getStaticProps({ params: { prefix }, locale, revalidateRea
     locale,
     revalidateReason,
   })
+
+  const canonical = !isStaticExport && uuidPostRedirect(props.post, [prefix])
+  if (canonical) return canonical
 
   return {
     props,

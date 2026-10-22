@@ -1,5 +1,5 @@
 import { useGlobal } from '@/lib/global'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * 加密文章校验组件
@@ -12,21 +12,23 @@ export const ArticleLock = props => {
   const { validPassword } = props
   const { locale } = useGlobal()
 
-  const submitPassword = () => {
-    const p = document.getElementById('password')
-    if (!validPassword(p?.value)) {
-      const tips = document.getElementById('tips')
-      if (tips) {
-        tips.innerHTML = ''
-        tips.innerHTML = `<div class='text-red-500 animate__shakeX animate__animated'>${locale.COMMON.PASSWORD_ERROR}</div>`
-      }
+  const passwordInputRef = useRef(null)
+  const [error, setError] = useState(false)
+
+  const submitPassword = async () => {
+    const value = passwordInputRef.current?.value ?? ''
+    setError(false)
+    try {
+      const ok = await validPassword(value)
+      setError(!ok)
+    } catch {
+      setError(true)
     }
   }
 
-  const passwordInputRef = useRef(null)
   useEffect(() => {
     // 选中密码输入框并将其聚焦
-    passwordInputRef.current.focus()
+    passwordInputRef.current?.focus()
   }, [])
 
   return <div id='container' className='w-full flex justify-center items-center h-96 '>
@@ -47,7 +49,12 @@ export const ArticleLock = props => {
           <span className='ml-1'>{locale.COMMON.SUBMIT}</span>
         </div>
       </div>
-      <div id='tips'>
+      <div id='tips' aria-live='polite'>
+        {error && (
+          <div className='text-red-500 animate__shakeX animate__animated'>
+            {locale.COMMON.PASSWORD_ERROR}
+          </div>
+        )}
       </div>
     </div>
   </div>

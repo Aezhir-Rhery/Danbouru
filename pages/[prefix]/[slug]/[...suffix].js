@@ -1,3 +1,4 @@
+import { uuidPostRedirect } from '@/lib/utils/uuidPostRedirect'
 import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { resolvePostProps } from '@/lib/db/SiteDataApi'
@@ -51,6 +52,9 @@ export async function getStaticProps({
     locale,
     revalidateReason,
   })
+
+  const canonical = !isStaticExport && uuidPostRedirect(props.post, [prefix, slug, ...suffix])
+  if (canonical) return canonical
 
   return {
     props,

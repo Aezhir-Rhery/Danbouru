@@ -15,6 +15,7 @@ import { generateRedirectJson } from '@/lib/utils/redirect'
 import { checkDataFromAlgolia } from '@/lib/plugins/algolia'
 import pLimit from 'p-limit'
 import { adapterNotionBlockMap } from '@/lib/utils/notion.util'
+import { compactPageData, filterHomePosts } from '@/themes/danbouru/lib/pageData'
 
 /**
  * 首页布局
@@ -68,6 +69,8 @@ export async function getStaticProps(req) {
   props.posts = props.allPages?.filter(
     page => page.type === 'Post' && page.status === 'Published'
   )
+  const isDanbouru = siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG) === 'danbouru'
+  if (isDanbouru) props.posts = filterHomePosts(props.posts, props.NOTION_CONFIG || {})
 
   // 处理分页
   const POST_LIST_STYLE = siteConfig(
@@ -131,6 +134,7 @@ export async function getStaticProps(req) {
   }
   props.latestPosts = cleanPostSummaries(props.latestPosts)
   delete props.allPages
+  if (isDanbouru) compactPageData(props, { home: true })
 
   return {
     props,

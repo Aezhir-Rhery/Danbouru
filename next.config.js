@@ -1,6 +1,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const BLOG = require('./blog.config')
+const { buildLegacyRedirects } = require('./themes/danbouru/lib/legacyRedirects.cjs')
 const { extractLangPrefix } = require('./lib/utils/pageId')
 const { isExport } = require('./lib/utils/buildMode')
 const { getStaticPageGenerationTimeoutSec } = require('./lib/build/buildEnv')
@@ -256,6 +257,8 @@ const nextConfig = {
     ? undefined
     : () => {
       return [
+        // Netlify serves public/_redirects at the CDN; avoid duplicate rules.
+        ...(process.env.NETLIFY === 'true' ? [] : buildLegacyRedirects()),
         {
           source: '/feed',
           destination: '/rss/feed.xml',
